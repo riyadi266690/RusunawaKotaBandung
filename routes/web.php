@@ -18,29 +18,30 @@ Route::prefix($prefix)->group(function () {
         return token_sadarkajabar();
     });
     Route::get('login', [AuthController::class, 'login'])->name('login');
-    Route::prefix('pendaftaran')->name('pendaftaran.')->group(function() {
+    Route::prefix('pendaftaran')->name('pendaftaran.')->group(function () {
         Route::get('index', [PendaftaranController::class, 'index'])->name('index');
-        Route::post('store', [PendaftaranController::class, 'store'])->name('store');    
+        Route::post('store', [PendaftaranController::class, 'store'])->name('store');
     });
-    Route::prefix('auth')->name('auth.')->group(function() {
+
+    Route::prefix('auth')->name('auth.')->group(function () {
         Route::get('login', [AuthController::class, 'login'])->name('login');
         Route::post('login', [AuthController::class, 'authenticate'])->name('authenticate');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
         Route::get('password/form', [AuthController::class, 'passwordForm'])->name('password.form');
         Route::post('password/update', [AuthController::class, 'updatePassword'])->name('password.update');
     });
-    Route::prefix('dashboard')->name('dashboard.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function() {
-        Route::get('index', [DashboardController::class ,'index'])->name('index');
+    Route::prefix('dashboard')->name('dashboard.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function () {
+        Route::get('index', [DashboardController::class, 'index'])->name('index');
     });
-    Route::prefix('pendaftar')->name('pendaftar.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function() {
-        Route::get('index', [PendaftaranController::class, 'index_pengelola'])->name('index');    
-        Route::post('/update-tgl-wawancara/{id}', [PendaftaranController::class, 'updateTanggalWawancara'])->name('updateWawancara'); 
-        Route::post('/update-tgl-final/{id}', [PendaftaranController::class, 'updateTanggalSelesai'])->name('updateSelesai');   
-        Route::get('ajax.pendaftar', [PendaftaranController::class, 'ajax_DTpendaftar'])->name('ajax.DTPendaftar'); 
+    Route::prefix('pendaftar')->name('pendaftar.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function () {
+        Route::get('index', [PendaftaranController::class, 'index_pengelola'])->name('index');
+        Route::post('/update-tgl-wawancara/{id}', [PendaftaranController::class, 'updateTanggalWawancara'])->name('updateWawancara');
+        Route::post('/update-tgl-final/{id}', [PendaftaranController::class, 'updateTanggalSelesai'])->name('updateSelesai');
+        Route::get('ajax.pendaftar', [PendaftaranController::class, 'ajax_DTpendaftar'])->name('ajax.DTPendaftar');
     });
-    Route::prefix('penghuni')->name('penghuni.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function() {
-        Route::get('index', [PenghuniController::class, 'index'])->name('index');    
-        Route::post('store', [PenghuniController::class, 'store'])->name('store');    
+    Route::prefix('penghuni')->name('penghuni.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function () {
+        Route::get('index', [PenghuniController::class, 'index'])->name('index');
+        Route::post('store', [PenghuniController::class, 'store'])->name('store');
         Route::get('/{id}/edit', [PenghuniController::class, 'edit'])->name('edit');
         Route::put('/{id}', [PenghuniController::class, 'update'])->name('update');
         Route::delete('/{id}', [PenghuniController::class, 'destroy'])->name('destroy');
@@ -83,14 +84,14 @@ Route::prefix($prefix)->group(function () {
     });
 
     // Route untuk Kontrak
-    Route::prefix('kontrak')->name('kontrak.')->group(function() {
+    Route::prefix('kontrak')->name('kontrak.')->group(function () {
         Route::get('aktif', [KontrakController::class, 'kontrakAktif'])->name('aktif');
         Route::get('non_aktif', [KontrakController::class, 'kontrakNonAktif'])->name('non_aktif'); // Akan diimplementasikan nanti
 
         // AJAX DataTables
         Route::get('ajax-kontrak-aktif', [KontrakController::class, 'ajax_DTKontrakAktif'])->name('ajax.DTKontrakAktif');
         Route::get('ajax-kontrak-non-aktif', [KontrakController::class, 'ajax_DTKontrakNonAktif'])->name('ajax.DTKontrakNonAktif');
-        
+
         // Route::get('ajax-kontrak-non-aktif', [KontrakController::class, 'ajax_DTKontrakNonAktif'])->name('ajax.DTKontrakNonAktif'); // Akan diimplementasikan nanti
 
         // CRUD Kontrak
@@ -114,7 +115,5 @@ Route::prefix($prefix)->group(function () {
         $nik = "3204282606900008";
         $nik2 = "1102072705850001";
         dd(getDataIndividu($nik));
-    
-        
     });
 });

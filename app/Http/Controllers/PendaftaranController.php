@@ -25,23 +25,26 @@ class PendaftaranController extends Controller
     {
         return view('pendaftaran.index_pengelola');
     }
-       public function ajax_DTpendaftar(Request $request)
+    public function ajax_DTpendaftar(Request $request)
     {
         $query = Pendaftaran::query()
-            ->select('nama', 'id',
-                     'telp_pendaftar',
-                     'suket',
-                     'status_daftar',
-                     'tgl_daftar',
-                     'tgl_wawancara',
-                     'tgl_final',
-                     'ket_wawancara',
-                     'suket',
-                     'updated_by')
+            ->select(
+                'nama',
+                'id',
+                'telp_pendaftar',
+                'suket',
+                'status_daftar',
+                'tgl_daftar',
+                'tgl_wawancara',
+                'tgl_final',
+                'ket_wawancara',
+                'suket',
+                'updated_by'
+            )
             ->orderBy('id', 'desc');
-        
+
         $pendaftars = $query->get();
-        
+
         // Kumpulkan semua nama dan telp terenkripsi
         $encryptedTexts = $pendaftars->pluck('nama')->merge($pendaftars->pluck('telp_pendaftar'))->toArray();
         $decryptedTextsMap = unsealNames($encryptedTexts);
@@ -52,98 +55,10 @@ class PendaftaranController extends Controller
             return $item;
         });
 
-        return DataTables::of($pendaftars)
-        ->addColumn('status', function($w){
-            switch ($w->status_daftar) {
-                case 1:
-                    return '<span class="badge bg-warning">Menunggu</span>';
-                case 2:
-                    return '<span class="badge bg-info">Wawancara</span>';
-                case 3:
-                    return '<span class="badge bg-success">Selesai</span>';
-                default:
-                    return '<span class="badge bg-secondary">Tidak Diketahui</span>';
-            }
-        })
-        ->addColumn('daftar', function($w){
-            return $w->tgl_daftar ? Carbon::parse($w->tgl_daftar)->format('d-m-Y') : '-';
-        })
-        ->addColumn('nama', function($w){
-            if ($w->suket) {
-                $downloadUrl = asset('storage/' . $w->suket);
-                return $w->nama . '<br>' . '<a href="' . $downloadUrl . '" class="edit edit-primary edit-sm mt-1" target="_blank">Download Suket</a>';
-            }
-            
-            return $w->nama;
-        })
-        ->addColumn('wawancara', function ($item) {
-            $tglWawancaraFormatted = $item->tgl_wawancara ? Carbon::parse($item->tgl_wawancara)->format('d-m-Y') : 'Pilih Tanggal';
-            $itemId = $item->id;
-            $isSet = $item->tgl_wawancara ? 'true' : 'false';
-
-            return '
-                <a href="#" 
-                   class="edit-wawancara-btn" 
-                   data-id="' . $itemId . '"
-                   data-tgl="' . ($item->tgl_wawancara ?? '') . '"
-                   data-isset="' . $isSet . '">
-                    ' . $tglWawancaraFormatted . '
-                </a>
-            ';
-        })
-        // Kolom BARU: tombol interaktif untuk tanggal selesai
-        ->addColumn('selesai', function($item){
-            $tglFinalFormatted = $item->tgl_final ? Carbon::parse($item->tgl_final)->format('d-m-Y') : 'Pilih Tanggal';
-            $itemId = $item->id;
-            $isSet = $item->tgl_final ? 'true' : 'false';
-
-
-            // Logika untuk menonaktifkan tombol jika tgl_wawancara null
-            if (empty($item->tgl_wawancara)) {
-                return '<span class="disabled-link"
-                            data-id="' . $itemId . '"
-                            data-tgl="' . ($item->tgl_final ?? '') . '"
-                            data-catatan="' . ($item->ket_wawancara ?? '') . '"
-                            data-isset="' . $isSet . '">
-                            -
-                        </span>';
-            } else {
-                return '
-                    <a href="#" 
-                       class="edit-selesai-btn" 
-                       data-id="' . $itemId . '"
-                       data-tgl="' . ($item->tgl_final ?? '') . '"
-                       data-catatan="' . ($item->ket_wawancara ?? '') . '"
-                       data-isset="' . $isSet . '">
-                        ' . $tglFinalFormatted . '
-                    </a>
-                ';
-            }
-            //return '
-            //    <a href="#" 
-            //       class="edit-selesai-btn" 
-            //       data-id="' . $itemId . '"
-            //       data-tgl="' . ($item->tgl_final ?? '') . '"
-            //       data-catatan="' . ($item->ket_wawancara ?? '') . '"
-            //       data-isset="' . $isSet . '">
-            //        ' . $tglFinalFormatted . '
-            //    </a>
-            //';
-        })
-        ->addColumn('ket_wawancara', function ($w) {
-            // Membungkus catatan dengan tag span agar bisa di-styling
-            return '<span class="text-wrap">' . $w->ket_wawancara . '</span>';
-        })
-        ->addColumn('aksi', function($w){
-            return '<div class="btn-group">
-                        <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
-                        <div class="dropdown-menu">                                                          
-                            <a class="dropdown-item" href="#" onclick="hapus">Hapus</a>                        
-                        </div>
-                    </div>';
-        })
-        ->rawColumns(['aksi','status','daftar','wawancara','selesai','nama', 'ket_wawancara'])
-        ->toJson();
+        return response()->json([
+            'sukses' => true,
+            'data' => $pendaftars
+        ]);
     }
     /**
      * Show the form for creating a new resource.
@@ -156,34 +71,34 @@ class PendaftaranController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-     public function store(Request $request)
+    public function store(Request $request)
     {
         // Validasi data awal tanpa memeriksa unik
         $validator = Validator::make($request->all(), [
             'nama' => 'required|string|max:255',
             'telp_pendaftar' => 'required|numeric',
-            'suket' => 'required|file|mimes:pdf|max:2048', 
-        ],[
+            'suket' => 'required|file|mimes:pdf|max:2048',
+        ], [
             'nama.required' => 'Nama lengkap harus diisi.',
             'telp_pendaftar.required' => 'No Telp / WhatsApp harus diisi.',
             'telp_pendaftar.numeric' => 'No Telp / WhatsApp harus berupa angka.',
             'suket.required' => 'Unggah Formulir Pendaftaran harus diisi.',
             'suket.mimes' => 'File harus berupa PDF.',
-            'suket.max' => 'Ukuran file tidak boleh lebih dari 2MB.',   
+            'suket.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
         ]);
 
         if ($validator->fails()) {
-            $errors = $validator->errors()->all();
-            $errorString = implode('<br>', $errors);
-            return back()->with('gagal', $errorString)->withInput();
+            return $request->expectsJson()
+                ? response()->json(['errors' => $validator->errors()], 422)
+                : back()->withErrors($validator)->withInput();
         }
 
         try {
-            DB::beginTransaction();            
-            
+            DB::beginTransaction();
+
             // Panggil helper untuk membuat HMAC dari nomor telepon untuk pengecekan unik
-            $phoneHmac = hmac($request->telp_pendaftar);
-            
+            $phoneHmac = generateHmac($request->telp_pendaftar);
+
             if (!$phoneHmac) {
                 throw new Exception('Gagal mendapatkan HMAC dari API.');
             }
@@ -192,44 +107,35 @@ class PendaftaranController extends Controller
             $existingPendaftar = Pendaftaran::where('telp_pendaftar_hash', $phoneHmac)->first();
             if ($existingPendaftar) {
                 DB::rollback();
-                return back()->with('gagal', 'No Telp / WhatsApp sudah terdaftar.')->withInput();
+                // return back()->with('gagal', 'No Telp / WhatsApp sudah terdaftar.')->withInput();
+                return response()->json([
+                    'gagal' => 'No Telp / WhatsApp sudah terdaftar.'
+                ]);
             }
-
-            // Siapkan array data yang akan dienkripsi untuk kerahasiaan
-            $plainTexts = [
-                $request->nama,
-                $request->telp_pendaftar,
-            ];
-
-            // Panggil helper untuk melakukan batch sealing
-            $encryptedTexts = sealNames($plainTexts);
-
-            if (empty($encryptedTexts) || count($encryptedTexts) < 2) {
-                throw new Exception('Gagal mendapatkan respons enkripsi yang valid dari API.');
-            }
-
-            $encryptedNama = $encryptedTexts[$request->nama];
-            $encryptedTelp = $encryptedTexts[$request->telp_pendaftar];
 
             // Simpan file yang diunggah
             $filePath = $request->file('suket')->store('suket', 'public');
-            
-            // Buat record pendaftar baru
+
             $data = new Pendaftaran();
-            $data->nama = $encryptedNama;
-            $data->telp_pendaftar = $encryptedTelp;
-            $data->telp_pendaftar_hash = $phoneHmac; // Simpan HMAC
+            $data->nama = $request->nama;
+            $data->telp_pendaftar = $request->telp_pendaftar;
+            $data->telp_pendaftar_hash = $phoneHmac;
             $data->suket = $filePath;
             $data->status_daftar = 1;
-            $data->tgl_daftar = now();            
+            $data->tgl_daftar = now();
             $data->save();
 
-            DB::commit();               
-            return redirect()->route('pendaftaran.index')->with('sukses', 'Pendaftaran berhasil dilakukan.');
+            DB::commit();
+            return response()->json([
+                'message' => 'Pendaftaran berhasil dilakukan',
+                'data' => $data
+            ]);
         } catch (\Exception $e) {
-             DB::rollback();
-            Log::error('Error simpan: '.$e->getMessage());
-            return back()->with('gagal', 'Terjadi kesalahan: '.$e->getMessage());
+            DB::rollback();
+            return response()->json([
+                'error' => 'Terjadi kesalahan',
+                'detail' => $e->getMessage()
+            ]);
         }
     }
 
@@ -257,47 +163,55 @@ class PendaftaranController extends Controller
         // Validasi data yang masuk dari AJAX
         $validator = Validator::make($request->all(), [
             'tgl_wawancara' => 'required|date',
-            'ket_wawancara' => 'nullable|string', // Kolom baru untuk catatan
-        ],[
+            'tgl_final' => 'nullable|date',
+            'ket_wawancara' => 'nullable|string',
+        ], [
             'tgl_wawancara.required' => 'Tanggal wawancara harus diisi.',
             'tgl_wawancara.date' => 'Format tanggal tidak valid.',
+            'tgl_final.nullable' => 'Tanggal selesai harus diisi.',
+            'tgl_final.date' => 'Format selesai tidak valid.',
         ]);
 
-        // Jika validasi gagal, kembalikan respons JSON dengan error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY); // Kode 422
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-
-         try {
-            // Mulai transaksi database
+        try {
             DB::beginTransaction();
 
-            $pendaftar = Pendaftaran::findOrFail($id);
-            $pendaftar->tgl_wawancara = $request->tgl_wawancara;
-            $pendaftar->ket_wawancara = $request->ket_wawancara; // Simpan catatan
-            $pendaftar->status_daftar = 2; // Ganti status menjadi Wawancara
-            // Baris updated_by dihapus karena sudah ditangani di model
-            $pendaftar->save();
+            $pendaftar = Pendaftaran::find($id);
 
-            // Jika semua operasi berhasil, commit transaksi
+            if (!$pendaftar) {
+                return response()->json([
+                    'message' => 'Data tidak ditemukan'
+                ]);
+            }
+
+            $pendaftar->tgl_wawancara = $request->tgl_wawancara;
+            $pendaftar->ket_wawancara = $request->ket_wawancara;
+            $pendaftar->tgl_final = $request->tgl_final;
+            $pendaftar->status_daftar = 2;
+            $pendaftar->save();
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'Tanggal dan catatan wawancara berhasil diperbarui.']);
+            return response()->json([
+                'success' => true,
+                'message' => 'Tanggal dan catatan wawancara berhasil diperbarui.'
+            ]);
         } catch (\Exception $e) {
-            // Jika terjadi kesalahan, batalkan semua perubahan
             DB::rollback();
+            Log::error('Error update wawancara: ' . $e->getMessage());
 
-            // Catat error untuk debugging
-            Log::error('Error update wawancara: '.$e->getMessage());
-
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage()
+            ]);
         }
     }
-   
+
     public function updateTanggalSelesai(Request $request, $id)
     {
         // Ambil data pendaftar untuk mendapatkan tgl_wawancara
@@ -307,31 +221,29 @@ class PendaftaranController extends Controller
         // Validasi data yang masuk dari AJAX
         $validator = Validator::make($request->all(), [
             'tgl_final' => 'required|date|after_or_equal:' . $tglWawancara, // Aturan BARU
-            'ket_wawancara' => 'nullable|string', 
-        ],[
+            'ket_wawancara' => 'nullable|string',
+        ], [
             'tgl_final.required' => 'Tanggal selesai harus diisi.',
             'tgl_final.date' => 'Format tanggal tidak valid.',
             'tgl_final.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal wawancara.', // Pesan BARU
             'ket_wawancara.string' => 'Catatan wawancara harus berupa teks.',
         ]);
 
-        // Jika validasi gagal, kembalikan respons JSON dengan error
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY); // Kode 422
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-         try {
+        try {
             // Mulai transaksi database
             DB::beginTransaction();
 
             $pendaftar = Pendaftaran::findOrFail($id);
             $pendaftar->tgl_final = $request->tgl_final;
             $pendaftar->ket_wawancara = $request->ket_wawancara; // Simpan catatan
-            $pendaftar->status_daftar = 3; // Ganti status menjadi Diterima
-            // Baris updated_by dihapus karena sudah ditangani di model
+            $pendaftar->status_daftar = 3;
             $pendaftar->save();
 
             // Jika semua operasi berhasil, commit transaksi
@@ -339,11 +251,8 @@ class PendaftaranController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Tanggal dan catatan selesai berhasil diperbarui.']);
         } catch (\Exception $e) {
-            // Jika terjadi kesalahan, batalkan semua perubahan
             DB::rollback();
-
-            // Catat error untuk debugging
-            Log::error('Error update selesai: '.$e->getMessage());
+            Log::error('Error update selesai: ' . $e->getMessage());
 
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage()]);
         }

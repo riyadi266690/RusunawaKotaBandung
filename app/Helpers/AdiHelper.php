@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Request;
+
 if (!function_exists('terbilang')) {
     function terbilang($x)
     {
@@ -52,12 +53,13 @@ if (!function_exists('has_access')) {
         if (!$user) return false;
 
         return $user->Role()
-                    ->where('fitur', $fitur)
-                    ->where('akses', 1)
-                    ->exists();
+            ->where('fitur', $fitur)
+            ->where('akses', 1)
+            ->exists();
     }
 }
-function seal($var){
+function seal($var)
+{
     $certFile = config('services.bssn.cert_path');
     $keyFile = config('services.bssn.key_path');
     $url = 'https://10.202.26.39:2709/seal';
@@ -89,41 +91,42 @@ function seal($var){
 
     return json_decode($response, true); // Jika response memang JSON
 }
-function unseal(array $var){
+function unseal(array $var)
+{
     $certFile = config('services.bssn.cert_path');
     $keyFile = config('services.bssn.key_path');
-     $url = 'https://10.202.26.39:2709/unseal';
+    $url = 'https://10.202.26.39:2709/unseal';
 
-     $postData = json_encode([
-         'Ciphertext' => array_map(function($name) {
-             return ['text' => $name];
-         }, $var)
-     ]);
+    $postData = json_encode([
+        'Ciphertext' => array_map(function ($name) {
+            return ['text' => $name];
+        }, $var)
+    ]);
 
-     $ch = curl_init($url);
-     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-     curl_setopt($ch, CURLOPT_SSLCERT, $certFile);
-     curl_setopt($ch, CURLOPT_SSLKEY, $keyFile);
-     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-     curl_setopt($ch, CURLOPT_POST, true);
-     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
-     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-         'Content-Type: application/json'
-     ));
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSLCERT, $certFile);
+    curl_setopt($ch, CURLOPT_SSLKEY, $keyFile);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/json'
+    ));
 
-     $response = curl_exec($ch);
-     curl_close($ch);
-     $parsedResponse = json_decode($response, true);
-     $decryptedNames = $parsedResponse['Plaintext'] ?? [];
+    $response = curl_exec($ch);
+    curl_close($ch);
+    $parsedResponse = json_decode($response, true);
+    $decryptedNames = $parsedResponse['Plaintext'] ?? [];
 
-     // Mengembalikan array asosiatif untuk memudahkan pencocokan
-     $result = [];
-     foreach ($decryptedNames as $index => $item) {
-         $result[$var[$index]] = $item['text'];
-     }
+    // Mengembalikan array asosiatif untuk memudahkan pencocokan
+    $result = [];
+    foreach ($decryptedNames as $index => $item) {
+        $result[$var[$index]] = $item['text'];
+    }
 
-     return $result;
+    return $result;
 }
 
 
@@ -141,7 +144,7 @@ if (!function_exists('sealNames')) {
         $url = 'https://10.202.26.39:2709/seal';
 
         $postData = json_encode([
-            'Plaintext' => array_map(function($text) {
+            'Plaintext' => array_map(function ($text) {
                 return ['text' => $text];
             }, $plainTexts)
         ]);
@@ -186,7 +189,7 @@ if (!function_exists('unsealNames')) {
         $url = 'https://10.202.26.39:2709/unseal';
 
         $postData = json_encode([
-            'Ciphertext' => array_map(function($text) {
+            'Ciphertext' => array_map(function ($text) {
                 return ['text' => $text];
             }, $encryptedTexts)
         ]);
@@ -226,7 +229,7 @@ if (!function_exists('hmac')) {
      * @param string $plainText
      * @return string|null
      */
-    function hmac(string $plainText)
+    function hmac($plainText)
     {
         $certFile = config('services.bssn.cert_path');
         $keyFile = config('services.bssn.key_path');
@@ -253,7 +256,7 @@ if (!function_exists('hmac')) {
 
         $response = curl_exec($ch);
         curl_close($ch);
-        
+
         // --- HANYA UNTUK TESTING ---
         // Baris ini akan menghentikan eksekusi dan menampilkan hasil respons mentah.
         // Hapus baris ini setelah pengujian selesai.
@@ -261,7 +264,7 @@ if (!function_exists('hmac')) {
         // -------------------------
 
         $parsedResponse = json_decode($response, true);
-        
+
         // Asumsi key response untuk single item adalah 'HMACstring'
         return $parsedResponse['Value'] ?? null;
     }
@@ -302,9 +305,9 @@ if (!function_exists('verifyhmac')) {
 
         $response = curl_exec($ch);
         curl_close($ch);
-        
+
         $parsedResponse = json_decode($response, true);
-        
+
         // Asumsi respons API adalah {"Value": true} atau {"Value": false}
         // Mengembalikan nilai boolean dari kunci 'Value'.
         return $parsedResponse['Value'] ?? null;
@@ -370,51 +373,51 @@ if (!function_exists('getDataIndividu')) {
      */
     function getDataIndividu($nik)
     {
-    $username = "4000000000001012";
-    $password = "(FW:kyryC]iz2ku(vI";
-    $apikey = "eyJ4NXQjUzI1NiI6Ik16WXhNbUZrT0dZd01XSTBaV05tTkRjeE5HWXdZbU00WlRBM01XSTJOREF6WkdRek5HTTBaR1JsTmpKa09ERmtaRFJpT1RGa01XRmhNelUyWkdWbE5nPT0iLCJraWQiOiJnYXRld2F5X2NlcnRpZmljYXRlX2FsaWFzIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ==.eyJzdWIiOiJwZF9kaXNwZXJraW0xQGphYmFycHJvdi5nby5pZCIsImFwcGxpY2F0aW9uIjp7Im93bmVyIjoicGRfZGlzcGVya2ltMUBqYWJhcnByb3YuZ28uaWQiLCJ0aWVyUXVvdGFUeXBlIjpudWxsLCJ0aWVyIjoiVW5saW1pdGVkIiwibmFtZSI6IlNJUEFUIiwiaWQiOjIzMjEsInV1aWQiOiI0ZWEwZWFmOC0xNWQ5LTQ4MTgtYWMwMy0zYTVlMjc3NGQ3MDgifSwiaXNzIjoiaHR0cHM6XC9cL3NwbHAubGF5YW5hbi5nby5pZDo0NDNcL29hdXRoMlwvdG9rZW4iLCJ0aWVySW5mbyI6eyJCcm9uemUiOnsidGllclF1b3RhVHlwZSI6InJlcXVlc3RDb3VudCIsImdyYXBoUUxNYXhDb21wbGV4aXR5IjowLCJncmFwaFFMTWF4RGVwdGgiOjAsInN0b3BPblF1b3RhUmVhY2giOnRydWUsInNwaWtlQXJyZXN0TGltaXQiOjAsInNwaWtlQXJyZXN0VW5pdCI6bnVsbH0sIlVubGltaXRlZCI6eyJ0aWVyUXVvdGFUeXBlIjoicmVxdWVzdENvdW50IiwiZ3JhcGhRTE1heENvbXBsZXhpdHkiOjAsImdyYXBoUUxNYXhEZXB0aCI6MCwic3RvcE9uUXVvdGFSZWFjaCI6dHJ1ZSwic3Bpa2VBcnJlc3RMaW1pdCI6MCwic3Bpa2VBcnJlc3RVbml0IjpudWxsfX0sImtleXR5cGUiOiJQUk9EVUNUSU9OIiwicGVybWl0dGVkUmVmZXJlciI6IiIsInN1YnNjcmliZWRBUElzIjpbeyJzdWJzY3JpYmVyVGVuYW50RG9tYWluIjoiamFiYXJwcm92LmdvLmlkIiwibmFtZSI6IlNJUEFORFUiLCJjb250ZXh0IjoiXC90XC9qYWJhcnByb3YuZ28uaWRcL3NpcGFuZHVcLzEiLCJwdWJsaXNoZXIiOiJhZG1pbkBqYWJhcnByb3YuZ28uaWQiLCJ2ZXJzaW9uIjoiMSIsInN1YnNjcmlwdGlvblRpZXIiOiJVbmxpbWl0ZWQifSx7InN1YnNjcmliZXJUZW5hbnREb21haW4iOiJqYWJhcnByb3YuZ28uaWQiLCJuYW1lIjoiU0lERUJBUiIsImNvbnRleHQiOiJcL3RcL2phYmFycHJvdi5nby5pZFwvc2lkZWJhclwvMSIsInB1Ymxpc2hlciI6ImFkbWluQGphYmFycHJvdi5nby5pZCIsInZlcnNpb24iOiIxIiwic3Vic2NyaXB0aW9uVGllciI6IlVubGltaXRlZCJ9LHsic3Vic2NyaWJlclRlbmFudERvbWFpbiI6ImphYmFycHJvdi5nby5pZCIsIm5hbWUiOiJTQURBUktBSkFCQVIiLCJjb250ZXh0IjoiXC90XC9qYWJhcnByb3YuZ28uaWRcL3NhZGFya2FqYWJhclwvMS4wMCIsInB1Ymxpc2hlciI6ImRpc2tvbV9lZGR5QGphYmFycHJvdi5nby5pZCIsInZlcnNpb24iOiIxLjAwIiwic3Vic2NyaXB0aW9uVGllciI6IkJyb256ZSJ9XSwidG9rZW5fdHlwZSI6ImFwaUtleSIsInBlcm1pdHRlZElQIjoiIiwiaWF0IjoxNzQ4OTEzNjk2LCJqdGkiOiI5ZTVhMjA4Ny0zZTA2LTQ2ZGQtOTBiOC0xYjA1ZmM1ODMyOWUifQ==.NdrKLEvnnOeSKhcOdGYODSzIcZ4-9UXhm5xVE_cpuBgorMsCngB4LN2I7tyeNhD2zygKCgCZR81qeJo3dul9N068K9qltILs2kmjUe7edQpvO7eWLvvoH9T-8pfyZRHazjyCD9XdJa-szo0Q8UuvPwrhWGIl6C5TX3W-JKHIsRaKKfC9uDRPI6-bLx93QBYa_cbFxxegoTO6IdAiaEZS3cIQDuSZA1adEvNt7VhDFziT9fOlTY2nX933Oyr7d9PEC6GFYcq-gBX6pdA50rGa3kNexDy05LVs1WWUQd628w3sDLS60bT7hE-z7a5YBPRvwbf5j8MKVbA0PAd6RAJCSA==";
+        $username = "4000000000001012";
+        $password = "(FW:kyryC]iz2ku(vI";
+        $apikey = "eyJ4NXQjUzI1NiI6Ik16WXhNbUZrT0dZd01XSTBaV05tTkRjeE5HWXdZbU00WlRBM01XSTJOREF6WkdRek5HTTBaR1JsTmpKa09ERmtaRFJpT1RGa01XRmhNelUyWkdWbE5nPT0iLCJraWQiOiJnYXRld2F5X2NlcnRpZmljYXRlX2FsaWFzIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ==.eyJzdWIiOiJwZF9kaXNwZXJraW0xQGphYmFycHJvdi5nby5pZCIsImFwcGxpY2F0aW9uIjp7Im93bmVyIjoicGRfZGlzcGVya2ltMUBqYWJhcnByb3YuZ28uaWQiLCJ0aWVyUXVvdGFUeXBlIjpudWxsLCJ0aWVyIjoiVW5saW1pdGVkIiwibmFtZSI6IlNJUEFUIiwiaWQiOjIzMjEsInV1aWQiOiI0ZWEwZWFmOC0xNWQ5LTQ4MTgtYWMwMy0zYTVlMjc3NGQ3MDgifSwiaXNzIjoiaHR0cHM6XC9cL3NwbHAubGF5YW5hbi5nby5pZDo0NDNcL29hdXRoMlwvdG9rZW4iLCJ0aWVySW5mbyI6eyJCcm9uemUiOnsidGllclF1b3RhVHlwZSI6InJlcXVlc3RDb3VudCIsImdyYXBoUUxNYXhDb21wbGV4aXR5IjowLCJncmFwaFFMTWF4RGVwdGgiOjAsInN0b3BPblF1b3RhUmVhY2giOnRydWUsInNwaWtlQXJyZXN0TGltaXQiOjAsInNwaWtlQXJyZXN0VW5pdCI6bnVsbH0sIlVubGltaXRlZCI6eyJ0aWVyUXVvdGFUeXBlIjoicmVxdWVzdENvdW50IiwiZ3JhcGhRTE1heENvbXBsZXhpdHkiOjAsImdyYXBoUUxNYXhEZXB0aCI6MCwic3RvcE9uUXVvdGFSZWFjaCI6dHJ1ZSwic3Bpa2VBcnJlc3RMaW1pdCI6MCwic3Bpa2VBcnJlc3RVbml0IjpudWxsfX0sImtleXR5cGUiOiJQUk9EVUNUSU9OIiwicGVybWl0dGVkUmVmZXJlciI6IiIsInN1YnNjcmliZWRBUElzIjpbeyJzdWJzY3JpYmVyVGVuYW50RG9tYWluIjoiamFiYXJwcm92LmdvLmlkIiwibmFtZSI6IlNJUEFORFUiLCJjb250ZXh0IjoiXC90XC9qYWJhcnByb3YuZ28uaWRcL3NpcGFuZHVcLzEiLCJwdWJsaXNoZXIiOiJhZG1pbkBqYWJhcnByb3YuZ28uaWQiLCJ2ZXJzaW9uIjoiMSIsInN1YnNjcmlwdGlvblRpZXIiOiJVbmxpbWl0ZWQifSx7InN1YnNjcmliZXJUZW5hbnREb21haW4iOiJqYWJhcnByb3YuZ28uaWQiLCJuYW1lIjoiU0lERUJBUiIsImNvbnRleHQiOiJcL3RcL2phYmFycHJvdi5nby5pZFwvc2lkZWJhclwvMSIsInB1Ymxpc2hlciI6ImFkbWluQGphYmFycHJvdi5nby5pZCIsInZlcnNpb24iOiIxIiwic3Vic2NyaXB0aW9uVGllciI6IlVubGltaXRlZCJ9LHsic3Vic2NyaWJlclRlbmFudERvbWFpbiI6ImphYmFycHJvdi5nby5pZCIsIm5hbWUiOiJTQURBUktBSkFCQVIiLCJjb250ZXh0IjoiXC90XC9qYWJhcnByb3YuZ28uaWRcL3NhZGFya2FqYWJhclwvMS4wMCIsInB1Ymxpc2hlciI6ImRpc2tvbV9lZGR5QGphYmFycHJvdi5nby5pZCIsInZlcnNpb24iOiIxLjAwIiwic3Vic2NyaXB0aW9uVGllciI6IkJyb256ZSJ9XSwidG9rZW5fdHlwZSI6ImFwaUtleSIsInBlcm1pdHRlZElQIjoiIiwiaWF0IjoxNzQ4OTEzNjk2LCJqdGkiOiI5ZTVhMjA4Ny0zZTA2LTQ2ZGQtOTBiOC0xYjA1ZmM1ODMyOWUifQ==.NdrKLEvnnOeSKhcOdGYODSzIcZ4-9UXhm5xVE_cpuBgorMsCngB4LN2I7tyeNhD2zygKCgCZR81qeJo3dul9N068K9qltILs2kmjUe7edQpvO7eWLvvoH9T-8pfyZRHazjyCD9XdJa-szo0Q8UuvPwrhWGIl6C5TX3W-JKHIsRaKKfC9uDRPI6-bLx93QBYa_cbFxxegoTO6IdAiaEZS3cIQDuSZA1adEvNt7VhDFziT9fOlTY2nX933Oyr7d9PEC6GFYcq-gBX6pdA50rGa3kNexDy05LVs1WWUQd628w3sDLS60bT7hE-z7a5YBPRvwbf5j8MKVbA0PAd6RAJCSA==";
 
-    // url get Token SPLP
-    $urlTokenSadarkajabar = 'https://api-splp.layanan.go.id/t/jabarprov.go.id/sadarkajabar/1.00/auth/getToken';
-    // baseUrl API
-    $baseURL = 'https://api-splp.layanan.go.id/t/jabarprov.go.id';
-    $token = "Bearer " . token_sadarkajabar();
-     $headers      = [
-        'Content-Type: application/json',
-        'Authorization: ' . $token,
-        'apikey:' . $apikey
-    ];
-    $postDataKirim = json_encode(
-        array(
-            "page" => 1,
-            "perpage" => 10,
-            "kab_kota" => "",
-            "kecamatan" => "",
-            "kelurahan_desa" => "",
-            "id_pertanyaan" => "26, 29, 30, 31, 36", //26 nama 29 jenis kelamin 30 tanggal lahir 31 status pernikahan 36 agama
-            "nik" => $nik
-        )
-    );
-    $pathResource = '/sadarkajabar/1.00/api/integrasi/getDataIndividu';
+        // url get Token SPLP
+        $urlTokenSadarkajabar = 'https://api-splp.layanan.go.id/t/jabarprov.go.id/sadarkajabar/1.00/auth/getToken';
+        // baseUrl API
+        $baseURL = 'https://api-splp.layanan.go.id/t/jabarprov.go.id';
+        $token = "Bearer " . token_sadarkajabar();
+        $headers      = [
+            'Content-Type: application/json',
+            'Authorization: ' . $token,
+            'apikey:' . $apikey
+        ];
+        $postDataKirim = json_encode(
+            array(
+                "page" => 1,
+                "perpage" => 10,
+                "kab_kota" => "",
+                "kecamatan" => "",
+                "kelurahan_desa" => "",
+                "id_pertanyaan" => "26, 29, 30, 31, 36", //26 nama 29 jenis kelamin 30 tanggal lahir 31 status pernikahan 36 agama
+                "nik" => $nik
+            )
+        );
+        $pathResource = '/sadarkajabar/1.00/api/integrasi/getDataIndividu';
 
-    $curl = curl_init();
-    curl_setopt_array($curl, array(
-        CURLOPT_URL => $baseURL . $pathResource,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 30,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLINFO_HEADER_OUT => true,
-        CURLOPT_POSTFIELDS => $postDataKirim,
-        CURLOPT_HTTPHEADER => $headers
-    ));
-     $response = curl_exec($curl);
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => $baseURL . $pathResource,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLINFO_HEADER_OUT => true,
+            CURLOPT_POSTFIELDS => $postDataKirim,
+            CURLOPT_HTTPHEADER => $headers
+        ));
+        $response = curl_exec($curl);
         $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         curl_close($curl);
-     $responseData = json_decode($response, true);
-    
-    // --- Mulai Pemetaan Data ---
+        $responseData = json_decode($response, true);
+
+        // --- Mulai Pemetaan Data ---
         if (isset($responseData['data']['data'][0])) {
             $individuData = $responseData['data']['data'][0];
             $questionsAnswers = $individuData['data'] ?? []; // Array pertanyaan dan jawaban

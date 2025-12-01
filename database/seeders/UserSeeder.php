@@ -18,7 +18,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'email' => 'admin@p3jb.com',
-                'password' => Hash::make('password'), // default password
+                'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
