@@ -15,72 +15,80 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $userId = Auth::id();
+
         // Query untuk mendapatkan total unit dan total terkontrak per lokasi
-        // Menggunakan nama-nama kolom dari ERD: nama_lokasi, nama_gedung
         $dashboardData = DB::table('lokasi as l')
             ->select(
                 'l.nama_lokasi as lokasi_nama',
                 DB::raw('COUNT(u.id) as total_unit'),
                 DB::raw('COUNT(k.id) as total_terkontrak')
             )
+            // --- FILTER LOKASI BERDASARKAN USER YANG LOGIN ---
+            ->join('lokasi_user as lu', 'l.id', '=', 'lu.lokasi_id')
+            ->where('lu.user_id', $userId)
+            // --------------------------------------------------
+            
             ->join('gedung as g', 'l.id', '=', 'g.lokasi_id')
             ->join('unit as u', 'g.id', '=', 'u.gedung_id')
             ->leftJoin('kontrak as k', function($join) {
-                // Bergabung dengan kontrak yang statusnya aktif (status_kontrak = 1)
                 $join->on('u.id', '=', 'k.unit_id')
-                     ->where('k.status_kontrak', '=', 1);
+                    ->where('k.status_kontrak', '=', 1);
             })
             ->groupBy('l.id', 'l.nama_lokasi')
             ->get();
         
-        // Menambahkan persentase terhuni ke setiap objek data
+        // Menambahkan persentase terhuni
         foreach ($dashboardData as $data) {
             $data->persentase_terhuni = 0;
             if ($data->total_unit > 0) {
                 $data->persentase_terhuni = round(($data->total_terkontrak / $data->total_unit) * 100);
             }
         }
-          // --- Logika untuk Mengambil Data Prakiraan dari Kontrak Asli ---
         $forecastData = [
-            'labels' => [],
-            'data' => [],
-        ];
-        
-        // Ambil semua kontrak aktif dari database
-        //$activeContracts = Kontrak::where('status_kontrak', 1)->get();
-        
-// Ambil semua kontrak (aktif dan tidak aktif) dari database
-$allContracts = Kontrak::all();
-        // Tentukan periode prakiraan (misalnya, 12 bulan ke depan)
-        $numMonths = 12;
-        $currentDate = Carbon::now();
-
-        for ($i = 0; $i < $numMonths; $i++) {
-    $forecastDate = $currentDate->copy()->addMonths($i);
+        'labels' => [],
+        'data' => [],
+    ];
     
-    $monthlyIncome = 0;
-    
-    foreach ($allContracts as $contract) {
-        $contractStartDate = Carbon::parse($contract->tgl_awal);
-        
-        // Periksa status kontrak dan tentukan tanggal akhir yang sesuai
-        if ($contract->status_kontrak == 1) { // Kontrak aktif
-            $contractEndDate = Carbon::parse($contract->tgl_akhir);
-        } else { // Kontrak tidak aktif
-            $contractEndDate = Carbon::parse($contract->tgl_keluar);
-        }
+    // AMBIL SEMUA KONTRAK YANG DI AKSES USER (Menggunakan Scope Eloquent)
+    $allContracts = Kontrak::aksesUser()->get();
 
-        // Periksa apakah kontrak masih berlaku dalam periode prakiraan
-        if ($contractStartDate->lte($forecastDate) && $contractEndDate->gte($forecastDate)) {
-            $monthlyIncome += $contract->harga_sewa;
+    // Tentukan periode prakiraan (misalnya, 12 bulan ke depan)
+    $numMonths = 12;
+    $currentDate = Carbon::now();
+
+    for ($i = 0; $i < $numMonths; $i++) {
+        $forecastDate = $currentDate->copy()->addMonths($i);
+        
+        $monthlyIncome = 0;
+        
+        foreach ($allContracts as $contract) {
+            $contractStartDate = Carbon::parse($contract->tgl_awal);
+            
+            // Tentukan tanggal akhir yang sesuai
+            $contractEndDate = $contract->status_kontrak == 1 
+                               ? Carbon::parse($contract->tgl_akhir) 
+                               : Carbon::parse($contract->tgl_keluar);
+            
+            // Periksa apakah kontrak masih berlaku dalam periode prakiraan
+            if ($contractStartDate->lte($forecastDate) && $contractEndDate->gte($forecastDate)) {
+                // HANYA TAMBAHKAN JIKA STATUS KONTRAK AKTIF (1)
+                // ATAU JIKA INGIN MEMASUKKAN PENDAPATAN DARI KONTRAK YANG SUDAH BERAKHIR (0),
+                // tetapi perhitungannya harus sesuai dengan masa berlaku.
+                
+                // Disarankan: Untuk forecast pendapatan masa depan, hanya kontrak AKTIF yang relevan
+                if ($contract->status_kontrak == 1) {
+                     $monthlyIncome += $contract->harga_sewa;
+                }
+            }
         }
+        
+        $forecastData['labels'][] = $forecastDate->format('M Y');
+        $forecastData['data'][] = $monthlyIncome;
     }
-    
-    $forecastData['labels'][] = $forecastDate->format('M Y');
-    $forecastData['data'][] = $monthlyIncome;
-}
-        // Mengirim data ke view
-        return view('dashboard.index', compact('dashboardData','forecastData'));
+
+    // Mengirim data ke view
+    return view('dashboard.index', compact('dashboardData','forecastData'));
     }
 
     /**

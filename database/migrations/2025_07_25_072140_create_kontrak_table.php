@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('tipe_kontrak'); //1 unit hunian 2 unit RBH
             $table->date('tgl_awal');
             $table->date('tgl_akhir');
-            $table->date('tgl_keluar');
+            $table->date('tgl_keluar')->nullable();
             $table->integer('masa_kontrak')->nullable(); //selisih antara tanggal awal dan tanggal akhir / tgl keluar
             $table->integer('status_kontrak');//1 aktif 0 non aktif
             $table->string('nama_pihak1');//ambil dari nama kepala lokasi di tabel lokasi

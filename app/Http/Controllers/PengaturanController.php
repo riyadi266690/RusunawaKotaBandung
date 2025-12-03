@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Gedung;
 use App\Models\Lokasi;
 use App\Models\Unit;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -36,6 +37,7 @@ class PengaturanController extends Controller
     public function ajax_DTLokasi(Request $request)
     {
         $query = Lokasi::query()
+            ->aksesUser()
             ->select('id', 'nama_lokasi', 'kepala_lokasi', 'alamat_lokasi')
             ->orderBy('id', 'asc');
         
@@ -90,7 +92,9 @@ class PengaturanController extends Controller
 
         try {
             DB::beginTransaction();
-            Lokasi::create($request->all());
+            $lokasi = Lokasi::create($request->all());
+            $userIds = [Auth::id()];
+            $lokasi->users()->attach($userIds);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data lokasi berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -183,7 +187,14 @@ class PengaturanController extends Controller
     public function getLokasiOptions()
     {
         try {
-            $lokasi = Lokasi::select('id', 'nama_lokasi')->get();
+            $lokasi = Lokasi::query()
+            // Terapkan scope AksesUser di sini!
+            // Hanya lokasi yang dimiliki oleh user yang login yang akan diambil
+            ->aksesUser() 
+            
+            ->select('id', 'nama_lokasi')
+            ->get();
+            
             return response()->json(['success' => true, 'data' => $lokasi]);
         } catch (\Exception $e) {
             Log::error('Error fetching lokasi options: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -202,6 +213,7 @@ class PengaturanController extends Controller
     public function ajax_DTGedung(Request $request)
     {
         $query = Gedung::query()
+            ->aksesUser()
             ->select('gedung.id', 'gedung.nama_gedung', 'gedung.tipe_gedung', 'lokasi.nama_lokasi as lokasi')
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
             ->orderBy('gedung.id', 'asc');
@@ -347,7 +359,9 @@ class PengaturanController extends Controller
     public function getGedungOptions()
     {
         try {
-            $gedung = Gedung::select('gedung.id', 'gedung.nama_gedung', 'lokasi.nama_lokasi as lokasi_nama')
+            $gedung = Gedung::query()
+                            ->aksesUser()
+                            ->select('gedung.id', 'gedung.nama_gedung', 'lokasi.nama_lokasi as lokasi_nama')
                             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
                             ->get();
             // Map data untuk format yang lebih mudah di frontend
@@ -375,6 +389,7 @@ class PengaturanController extends Controller
     public function ajax_DTUnit(Request $request)
     {
         $query = Unit::query()
+            ->aksesUser()
             ->select(
                 'unit.id', 
                 'unit.nomor', 

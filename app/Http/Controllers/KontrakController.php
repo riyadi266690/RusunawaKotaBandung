@@ -45,6 +45,7 @@ class KontrakController extends Controller
     {
         // Menggunakan query builder tanpa get()
         $query = Kontrak::query()
+        ->aksesUser()
             ->select(
                 'kontrak.id',
                 'kontrak.no_kontrak',
@@ -168,6 +169,7 @@ class KontrakController extends Controller
     {
         // Menggunakan query builder tanpa get()
         $query = Kontrak::query()
+        ->aksesUser()
             ->select(
                 'kontrak.id',
                 'kontrak.no_kontrak',
@@ -637,7 +639,9 @@ class KontrakController extends Controller
     {
         try {
             // Ambil unit yang belum memiliki kontrak aktif (status_jual = 1)
-            $units = Unit::select(
+            $units = Unit::query()
+            ->aksesuser()
+            ->select(
                 'unit.id',
                 'unit.nomor',
                 'unit.lantai',

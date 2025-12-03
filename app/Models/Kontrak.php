@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -58,6 +59,24 @@ class Kontrak extends Model
     public function deleter()
     {
         return $this->belongsTo(User::class, 'deleted_by');
+    }
+    public function scopeAksesUser(Builder $query): void
+    {
+        // Bypass Super Admin (opsional, disarankan jika ada Super Admin)
+        if (Auth::check() && Auth::user()->role_id == 1) { 
+            return; // Lihat semua
+        }
+
+        // Filter Kontrak yang Unit-nya berada di Lokasi yang diakses user.
+        $query->whereHas('unit', function ($qUnit) {
+            $qUnit->whereHas('gedung', function ($qGedung) {
+                $qGedung->whereHas('lokasi', function ($qLokasi) {
+                    $qLokasi->whereHas('users', function ($qUser) {
+                        $qUser->where('user_id', Auth::id());
+                    });
+                });
+            });
+        });
     }
 
     // Boot method untuk otomatis mengisi created_by, updated_by, dan deleted_by

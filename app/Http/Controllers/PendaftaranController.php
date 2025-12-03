@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Lokasi;
 use App\Models\Pendaftaran;
 use Carbon\Carbon;
 use Exception;
@@ -19,7 +20,12 @@ class PendaftaranController extends Controller
      */
     public function index()
     {
-        return view('pendaftaran.index');
+        $lokasi = Lokasi::query()
+        ->withCount('unitAvailable')
+        //->withCount('unit')total unit
+        ->get();
+        //$lokasi = Lokasi::all();
+        return view('pendaftaran.index', compact('lokasi'));
     }
     public function index_pengelola()
     {
@@ -28,7 +34,8 @@ class PendaftaranController extends Controller
        public function ajax_DTpendaftar(Request $request)
     {
         $query = Pendaftaran::query()
-            ->select('nama', 'id',
+            ->aksesUser()
+            ->select('nama', 'pendaftar.id',
                      'telp_pendaftar',
                      'suket',
                      'status_daftar',
@@ -37,7 +44,9 @@ class PendaftaranController extends Controller
                      'tgl_final',
                      'ket_wawancara',
                      'suket',
-                     'updated_by')
+                     'updated_by',
+                     'lokasi.nama_lokasi')
+            ->join('lokasi', 'pendaftar.lokasi_id', '=', 'lokasi.id')
             ->orderBy('id', 'desc');
         
         $pendaftars = $query->get();
@@ -55,15 +64,22 @@ class PendaftaranController extends Controller
         return DataTables::of($pendaftars)
         ->addColumn('status', function($w){
             switch ($w->status_daftar) {
-                case 1:
-                    return '<span class="badge bg-warning">Menunggu</span>';
-                case 2:
-                    return '<span class="badge bg-info">Wawancara</span>';
-                case 3:
-                    return '<span class="badge bg-success">Selesai</span>';
-                default:
-                    return '<span class="badge bg-secondary">Tidak Diketahui</span>';
-            }
+            case 1:
+                $badge = '<span class="badge bg-warning">Menunggu</span>';
+                break;
+            case 2:
+                $badge = '<span class="badge bg-info">Wawancara</span>';
+                break;
+            case 3:
+                $badge = '<span class="badge bg-success">Selesai</span>';
+                break;
+            default:
+                $badge = '<span class="badge bg-secondary">Tidak Diketahui</span>';
+                break;
+        }
+
+        // Tampilkan Nama Lokasi diikuti Status
+        return '<p class="fw-bold mb-1">' . $w->nama_lokasi . '</p>' . $badge;
         })
         ->addColumn('daftar', function($w){
             return $w->tgl_daftar ? Carbon::parse($w->tgl_daftar)->format('d-m-Y') : '-';
@@ -163,6 +179,7 @@ class PendaftaranController extends Controller
             'nama' => 'required|string|max:255',
             'telp_pendaftar' => 'required|numeric',
             'suket' => 'required|file|mimes:pdf|max:2048', 
+            'lokasi_id' => 'required|integer|exists:lokasi,id',
         ],[
             'nama.required' => 'Nama lengkap harus diisi.',
             'telp_pendaftar.required' => 'No Telp / WhatsApp harus diisi.',
@@ -170,6 +187,8 @@ class PendaftaranController extends Controller
             'suket.required' => 'Unggah Formulir Pendaftaran harus diisi.',
             'suket.mimes' => 'File harus berupa PDF.',
             'suket.max' => 'Ukuran file tidak boleh lebih dari 2MB.',   
+            'lokasi_id.required' => 'Lokasi harus dipilih (Kesalahan Form).', // <-- PESAN ERROR LOKASI
+            'lokasi_id.exists' => 'ID Lokasi tidak valid.',
         ]);
 
         if ($validator->fails()) {
@@ -214,12 +233,14 @@ class PendaftaranController extends Controller
             // Simpan file yang diunggah
             $filePath = $request->file('suket')->store('suket', 'public');
             
+            $lokasiId = $request->lokasi_id;
             // Buat record pendaftar baru
             $data = new Pendaftaran();
             $data->nama = $encryptedNama;
             $data->telp_pendaftar = $encryptedTelp;
             $data->telp_pendaftar_hash = $phoneHmac; // Simpan HMAC
             $data->suket = $filePath;
+            $data->lokasi_id = $lokasiId;
             $data->status_daftar = 1;
             $data->tgl_daftar = now();            
             $data->save();
