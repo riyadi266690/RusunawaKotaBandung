@@ -33,7 +33,7 @@ class RoleSeeder extends Seeder
                 'user_id' => 1,
                 'fitur' => 'pendaftar.update',
                 'akses' => 1,
-                'created_at' => now(),
+                'created_at' => now(),      
                 'updated_at' => now(),
             ],
             [
@@ -52,6 +52,97 @@ class RoleSeeder extends Seeder
             ],[
                 'user_id' => 1,
                 'fitur' => 'pendaftar.updateSelesai',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.index',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.ajax.DTPenghuni',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.store',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.getDataIndividuFromAPI',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.edit',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.update',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'penghuni.destroy',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'pengaturan.index',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'pengaturan.ajax.DTLokasi',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'pengaturan.ajax.DTGedung',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'pengaturan.ajax.ajax.DTUnit',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'kontrak.aktif',
+                'akses' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+                
+            ],[
+                'user_id' => 1,
+                'fitur' => 'kontrak.*',
                 'akses' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
