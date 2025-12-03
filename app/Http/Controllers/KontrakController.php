@@ -29,11 +29,29 @@ class KontrakController extends Controller
     }
     public function kontrakAktif()
     {
-        return view('kontrak.aktif');
+        $kontrak = Kontrak::where('status_kontrak', 1)->get();
+        if ($kontrak->isEmpty()) {
+            return response()->json([
+                'message' => 'Data kosong',
+            ]);
+        }
+        return response()->json([
+            'message' => 'Data ditemukan',
+            'data' => $kontrak
+        ]);
     }
     public function kontrakNonAktif()
     {
-        return view('kontrak.non_aktif');
+        $kontrak = Kontrak::where('status_kontrak', 0)->get();
+        if ($kontrak->isEmpty()) {
+            return response()->json([
+                'message' => 'Data kosong',
+            ]);
+        }
+        return response()->json([
+            'message' => 'Data ditemukan',
+            'data' => $kontrak
+        ]);
     }
     /**
      * Memproses data kontrak aktif untuk DataTables.
@@ -43,7 +61,6 @@ class KontrakController extends Controller
      */
     public function ajax_DTKontrakNonAktif(Request $request)
     {
-        // Menggunakan query builder tanpa get()
         $query = Kontrak::query()
             ->select(
                 'kontrak.id',
@@ -56,7 +73,6 @@ class KontrakController extends Controller
                 'kontrak.harga_sewa',
                 'kontrak.nama_pihak1',
                 'kontrak.dok_kontrak',
-                // Pastikan untuk menambahkan kolom foreign key di sini
                 'kontrak.penghuni_id1',
                 'kontrak.penghuni_id2',
                 'kontrak.penghuni_id3',
@@ -75,98 +91,15 @@ class KontrakController extends Controller
             ->where('kontrak.status_kontrak', 0)
             ->orderBy('kontrak.id', 'desc');
 
-        // Berikan query builder ke DataTables
-        return DataTables::of($query)
-            // Kolom untuk menampilkan data
-            
-            ->addColumn('unit_info', function ($kontrak) {
-                return $kontrak->unit_nomor . ' (Lantai ' . $kontrak->unit_lantai . ' - ' . $kontrak->unit_tipe_unit . ') <br> ' . $kontrak->gedung_nama . '<br> (' . $kontrak->lokasi_nama . ')';
-            })
-            ->addColumn('tipe_kontrak_label', function ($kontrak) {
-                return $kontrak->tipe_kontrak == 1 ? 'Unit Hunian' : 'Unit RBH';
-            })
-            ->addColumn('status_ttd_label', function ($kontrak) {
-                return $kontrak->status_ttd == 1 ? 'Sudah TTD' : 'Draft';
-            })
-            ->addColumn('masa_kontrak', function ($kontrak) {
-                $tglAwal = Carbon::parse($kontrak->tgl_awal);
-                $tglAkhir = $kontrak->tgl_keluar ? Carbon::parse($kontrak->tgl_keluar) : Carbon::parse($kontrak->tgl_akhir);
-                return $tglAwal->diffInMonths($tglAkhir) . ' bulan';
-            })
-            ->editColumn('no_kontrak', function ($kontrak) {
-                // Menampilkan nomor kontrak dan tautan dokumen dalam satu kolom
-                $dokumenLink = $kontrak->dok_kontrak 
-                    ? '<br><a href="' . asset('storage/' . $kontrak->dok_kontrak) . '" target="_blank">Lihat Dokumen</a>' 
-                    : '-';
-                return $kontrak->no_kontrak . $dokumenLink;
-            })
-            ->editColumn('tgl_awal', function ($kontrak) {
-                return Carbon::parse($kontrak->tgl_awal)->translatedFormat('d F Y');
-            })
-            ->editColumn('tgl_akhir', function ($kontrak) {
-                return Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y');
-            })
-            ->editColumn('tgl_keluar', function ($kontrak) {
-                return Carbon::parse($kontrak->tgl_keluar)->translatedFormat('d F Y');
-            })
-            // Kolom untuk menampilkan nama penghuni yang sudah didekripsi oleh accessor
-            ->editColumn('penghuni1_nama', function ($kontrak) {
-                return optional($kontrak->penghuni1)->nama ?? '-';
-            })
-            ->editColumn('penghuni2_nama', function ($kontrak) {
-                return optional($kontrak->penghuni2)->nama ?? '-';
-            })
-            ->editColumn('penghuni3_nama', function ($kontrak) {
-                return optional($kontrak->penghuni3)->nama ?? '-';
-            })
-            ->editColumn('penghuni4_nama', function ($kontrak) {
-                return optional($kontrak->penghuni4)->nama ?? '-';
-            })
-             // Tambahkan kolom baru untuk data child row
-             ->addColumn('details', function ($kontrak) {
-                // Mengambil nilai dari relasi dan memberikan nilai default jika null
-                $penghuni1 = $kontrak->penghuni1->nama ?? '-';
-                $penghuni2 = $kontrak->penghuni2->nama ?? '-';
-                $penghuni3 = $kontrak->penghuni3->nama ?? '-';
-                $penghuni4 = $kontrak->penghuni4->nama ?? '-';
-                
-                // Menghitung sisa hari dari tanggal saat ini ke tanggal akhir
-                $tglAkhir = Carbon::parse($kontrak->tgl_akhir);
-                $sisaHari = now()->diffInDays($tglAkhir);
+        $kontraks = $query->get();
 
-                return [
-                    'Masa Kontrak' => floor($sisaHari) . ' hari tersisa',
-                    'Status TTD' => $kontrak->status_ttd == 1 ? 'Sudah TTD' : 'Draft',
-                    'Harga Sewa' => number_format($kontrak->harga_sewa, 0, ',', '.') . ' ('. terbilang($kontrak->harga_sewa).' Rupiah)',
-                    'Pihak 1' => $kontrak->nama_pihak1 ?? '-',
-                    'Penghuni 1' => $penghuni1,
-                    'Penghuni 2' => $penghuni2,
-                    'Penghuni 3' => $penghuni3,
-                    'Penghuni 4' => $penghuni4,
-                ];
-            })
-            // Kolom untuk aksi
-            ->addColumn('aksi', function ($row) {
-                    $btn = '<div class="btn-group" role="group">';
-                    //$btn .= '<button type="button" class="btn btn-warning btn-sm" onclick="editKontrak(' . $row->id . ')">Edit</button>';
-                    // Tombol baru untuk memutuskan kontrak
-                    $btn .= '<button type="button" class="btn btn-info btn-sm" onclick="putusKontrak(' . $row->id . ')">Putus</button>';
-                    $btn .= '<button type="button" class="btn btn-danger btn-sm" onclick="hapusKontrak(' . $row->id . ')">Hapus</button>';
-                    $btn .= '</div>';
-                    return $btn;
-                })
-             ->filter(function ($query) use ($request) {
-                if ($keyword = $request->get('search')['value']) {
-                    // Lakukan pencarian langsung pada kolom no_kontrak
-                    $query->where('kontrak.no_kontrak', 'like', "%{$keyword}%");
-                }
-            })
-            ->rawColumns(['aksi', 'unit_info','no_kontrak'])
-            ->toJson();
+        return response()->json([
+            'message' => 'Data kontrak nonaktif ditemukan',
+            'data' => $kontraks
+        ]);
     }
     public function ajax_DTKontrakAktif(Request $request)
     {
-        // Menggunakan query builder tanpa get()
         $query = Kontrak::query()
             ->select(
                 'kontrak.id',
@@ -179,7 +112,6 @@ class KontrakController extends Controller
                 'kontrak.harga_sewa',
                 'kontrak.nama_pihak1',
                 'kontrak.dok_kontrak',
-                // Pastikan untuk menambahkan kolom foreign key di sini
                 'kontrak.penghuni_id1',
                 'kontrak.penghuni_id2',
                 'kontrak.penghuni_id3',
@@ -198,91 +130,12 @@ class KontrakController extends Controller
             ->where('kontrak.status_kontrak', 1)
             ->orderBy('kontrak.id', 'desc');
 
-        // Berikan query builder ke DataTables
-        return DataTables::of($query)
-            // Kolom untuk menampilkan data
-            
-            ->addColumn('unit_info', function ($kontrak) {
-                return $kontrak->unit_nomor . ' (Lantai ' . $kontrak->unit_lantai . ' - ' . $kontrak->unit_tipe_unit . ') <br> ' . $kontrak->gedung_nama . '<br> (' . $kontrak->lokasi_nama . ')';
-            })
-            ->addColumn('tipe_kontrak_label', function ($kontrak) {
-                return $kontrak->tipe_kontrak == 1 ? 'Unit Hunian' : 'Unit RBH';
-            })
-            ->addColumn('status_ttd_label', function ($kontrak) {
-                return $kontrak->status_ttd == 1 ? 'Sudah TTD' : 'Draft';
-            })
-            ->addColumn('masa_kontrak', function ($kontrak) {
-                $tglAwal = Carbon::parse($kontrak->tgl_awal);
-                $tglAkhir = $kontrak->tgl_keluar ? Carbon::parse($kontrak->tgl_keluar) : Carbon::parse($kontrak->tgl_akhir);
-                return $tglAwal->diffInMonths($tglAkhir) . ' bulan';
-            })
-            ->editColumn('no_kontrak', function ($kontrak) {
-                // Menampilkan nomor kontrak dan tautan dokumen dalam satu kolom
-                $dokumenLink = $kontrak->dok_kontrak 
-                    ? '<br><a href="' . asset('storage/' . $kontrak->dok_kontrak) . '" target="_blank">Lihat Dokumen</a>' 
-                    : '-';
-                return $kontrak->no_kontrak . $dokumenLink;
-            })
-            ->editColumn('tgl_awal', function ($kontrak) {
-                return Carbon::parse($kontrak->tgl_awal)->translatedFormat('d F Y');
-            })
-            ->editColumn('tgl_akhir', function ($kontrak) {
-                return Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y');
-            })
-            // Kolom untuk menampilkan nama penghuni yang sudah didekripsi oleh accessor
-            ->editColumn('penghuni1_nama', function ($kontrak) {
-                return optional($kontrak->penghuni1)->nama ?? '-';
-            })
-            ->editColumn('penghuni2_nama', function ($kontrak) {
-                return optional($kontrak->penghuni2)->nama ?? '-';
-            })
-            ->editColumn('penghuni3_nama', function ($kontrak) {
-                return optional($kontrak->penghuni3)->nama ?? '-';
-            })
-            ->editColumn('penghuni4_nama', function ($kontrak) {
-                return optional($kontrak->penghuni4)->nama ?? '-';
-            })
-             // Tambahkan kolom baru untuk data child row
-             ->addColumn('details', function ($kontrak) {
-                // Mengambil nilai dari relasi dan memberikan nilai default jika null
-                $penghuni1 = $kontrak->penghuni1->nama ?? '-';
-                $penghuni2 = $kontrak->penghuni2->nama ?? '-';
-                $penghuni3 = $kontrak->penghuni3->nama ?? '-';
-                $penghuni4 = $kontrak->penghuni4->nama ?? '-';
-                
-                // Menghitung sisa hari dari tanggal saat ini ke tanggal akhir
-                $tglAkhir = Carbon::parse($kontrak->tgl_akhir);
-                $sisaHari = now()->diffInDays($tglAkhir);
+        $kontraks = $query->get();
 
-                return [
-                    'Masa Kontrak' => floor($sisaHari) . ' hari tersisa',
-                    'Status TTD' => $kontrak->status_ttd == 1 ? 'Sudah TTD' : 'Draft',
-                    'Harga Sewa' => number_format($kontrak->harga_sewa, 0, ',', '.') . ' ('. terbilang($kontrak->harga_sewa).' Rupiah)',
-                    'Pihak 1' => $kontrak->nama_pihak1 ?? '-',
-                    'Penghuni 1' => $penghuni1,
-                    'Penghuni 2' => $penghuni2,
-                    'Penghuni 3' => $penghuni3,
-                    'Penghuni 4' => $penghuni4,
-                ];
-            })
-            // Kolom untuk aksi
-            ->addColumn('aksi', function ($row) {
-                    $btn = '<div class="btn-group" role="group">';
-                    //$btn .= '<button type="button" class="btn btn-warning btn-sm" onclick="editKontrak(' . $row->id . ')">Edit</button>';
-                    // Tombol baru untuk memutuskan kontrak
-                    $btn .= '<button type="button" class="btn btn-info btn-sm" onclick="putusKontrak(' . $row->id . ')">Putus</button>';
-                    $btn .= '<button type="button" class="btn btn-danger btn-sm" onclick="hapusKontrak(' . $row->id . ')">Hapus</button>';
-                    $btn .= '</div>';
-                    return $btn;
-                })
-             ->filter(function ($query) use ($request) {
-                if ($keyword = $request->get('search')['value']) {
-                    // Lakukan pencarian langsung pada kolom no_kontrak
-                    $query->where('kontrak.no_kontrak', 'like', "%{$keyword}%");
-                }
-            })
-            ->rawColumns(['aksi', 'unit_info','no_kontrak'])
-            ->toJson();
+        return response()->json([
+            'message' => 'Data kontran aktif ditemukan',
+            'data' => $kontraks
+        ]);
     }
 
     /**
@@ -293,7 +146,6 @@ class KontrakController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->all());
         $validator = Validator::make($request->all(), [
             'unit_id' => 'required|exists:unit,id|unique:kontrak,unit_id,NULL,id,status_kontrak,1',
             'no_kontrak' => 'required|string|max:255|unique:kontrak,no_kontrak',
@@ -306,15 +158,17 @@ class KontrakController extends Controller
             'tgl_akhir' => 'required|date|after_or_equal:tgl_awal',
             'nama_pihak1' => 'required|string|max:255',
             'status_ttd' => 'required|integer|in:0,1',
-            'penghuni_id1' => ['required', 'exists:penghuni,id',
+            'penghuni_id1' => [
+                'required',
+                'exists:penghuni,id',
                 // Aturan validasi kustom untuk memastikan penghuni hanya punya 1 kontrak aktif per tipe
                 function ($attribute, $value, $fail) use ($request) {
                     $existing = Kontrak::where('status_kontrak', 1)
                         ->where(function ($query) use ($value) {
                             $query->where('penghuni_id1', $value)
-                                  ->orWhere('penghuni_id2', $value)
-                                  ->orWhere('penghuni_id3', $value)
-                                  ->orWhere('penghuni_id4', $value);
+                                ->orWhere('penghuni_id2', $value)
+                                ->orWhere('penghuni_id3', $value)
+                                ->orWhere('penghuni_id4', $value);
                         })
                         ->where('tipe_kontrak', $request->input('tipe_kontrak'))
                         ->first();
@@ -372,26 +226,22 @@ class KontrakController extends Controller
 
             $data = $request->all();
             $data['status_kontrak'] = 1; // Selalu 1 untuk kontrak aktif
-            // Masa kontrak dihitung di frontend atau di DataTables, tidak perlu disimpan di sini
-            unset($data['masa_kontrak']); 
+            unset($data['masa_kontrak']); // Masa kontrak dihitung di frontend atau di DataTables, tidak perlu disimpan di sini
             unset($data['_method']); // Hapus _method dari data yang akan disimpan
 
             $kontrak = Kontrak::create($data);
-             // Setelah model dibuat, properti `id` akan terisi otomatis
             $kontrakId = $kontrak->id;
-            $filepath = storage_path('app/public/kontrak/'.$kontrakId.'/');
-                     if (!File::exists($filepath)) {
-                        File::makeDirectory($filepath, 0777, true, true);
-                    }
+            $filepath = storage_path('app/public/kontrak/' . $kontrakId . '/');
+            if (!File::exists($filepath)) {
+                File::makeDirectory($filepath, 0777, true, true);
+            }
             $totalHarga = ($kontrak->harga_sewa ?? 0) + ($kontrak->harga_air ?? 0);
-            //tambahkan fungsi pembuatan dokumen kontrak di sini
             switch ($data['tipe_kontrak']) {
-                case 1:                    
-                    // Panggil fungsi untuk membuat dokumen kontrak unit hunian
+                case 1:
                     $templatePath = public_path('template_document/HUNIAN.docx');
                     $templateProcessor = new TemplateProcessor($templatePath);
                     $templateProcessor->setValues([
-                        'tahun'             => date('Y'), //tahun saat ini date('Y'), 
+                        'tahun'             => date('Y'),
                         'no_kontrak'        => $kontrak->no_kontrak,
                         'nama_pihak1'       => strtoupper($kontrak->nama_pihak1),
                         'nama_penghuni1'    => $kontrak->penghuni1 ? $kontrak->penghuni1->nama : '-',
@@ -402,11 +252,11 @@ class KontrakController extends Controller
                         'nik'               => $kontrak->penghuni1 ? $kontrak->penghuni1->nik : '-',
                         'nama_gedung'       => $kontrak->unit->gedung->nama_gedung,
                         'lantai'            => $kontrak->unit->lantai,
-                        'nomor'             => $kontrak->unit->nomor, 
-                        'harga_sewa'        => number_format($kontrak->harga_sewa, 0, ',', '.'), // 'harga_sewa' diambil dari input
-                        'harga_sewa_bahasa' => ucwords(terbilang($kontrak->harga_sewa)).' Rupiah', //fungsi terbilang ada di helper.php
+                        'nomor'             => $kontrak->unit->nomor,
+                        'harga_sewa'        => number_format($kontrak->harga_sewa, 0, ',', '.'),
+                        'harga_sewa_bahasa' => ucwords(terbilang($kontrak->harga_sewa)) . ' Rupiah', //fungsi terbilang ada di helper.php
                         'tgl_akhir'         => Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y'),
-                        'tgl_awal_lengkap'  => Carbon::parse($kontrak->tgl_awal)->translatedFormat('l, d F ').ucwords(terbilang(Carbon::parse($kontrak->tgl_awal)->year)),
+                        'tgl_awal_lengkap'  => Carbon::parse($kontrak->tgl_awal)->translatedFormat('l, d F ') . ucwords(terbilang(Carbon::parse($kontrak->tgl_awal)->year)),
                     ]);
                     $templateProcessor->saveAs(storage_path('app/public/kontrak/' . $kontrakId . '/' . $kontrakId . '.docx'));
                     if (PHP_OS_FAMILY === 'Windows') {
@@ -428,13 +278,12 @@ class KontrakController extends Controller
                     $kontrak->save();
                     break;
                 case 2:
-// Panggil fungsi untuk membuat dokumen kontrak unit hunian
-                    $templatePath = public_path('template_document/RBH.docx');                    
+                    $templatePath = public_path('template_document/RBH.docx');
                     $templateProcessor = new TemplateProcessor($templatePath);
                     $templateProcessor->setValues([
-                        'nama_lokasi'       => strtoupper($kontrak->unit->gedung->lokasi->nama_lokasi), 
+                        'nama_lokasi'       => strtoupper($kontrak->unit->gedung->lokasi->nama_lokasi),
                         'no_kontrak'        => $kontrak->no_kontrak,
-                        'tgl_awal_lengkap'  => Carbon::parse($kontrak->tgl_awal)->translatedFormat('l, d F ').ucwords(terbilang(Carbon::parse($kontrak->tgl_awal)->year)),
+                        'tgl_awal_lengkap'  => Carbon::parse($kontrak->tgl_awal)->translatedFormat('l, d F ') . ucwords(terbilang(Carbon::parse($kontrak->tgl_awal)->year)),
                         'nama_pihak1'       => strtoupper($kontrak->nama_pihak1),
                         'nama_penghuni1'    => $kontrak->penghuni1 ? $kontrak->penghuni1->nama : '-',
                         'nik'               => $kontrak->penghuni1 ? $kontrak->penghuni1->nik : '-',
@@ -442,11 +291,11 @@ class KontrakController extends Controller
                         'jenis_usaha'        => $kontrak->jenis_usaha ?? '-',
                         'nama_gedung'       => $kontrak->unit->gedung->nama_gedung,
                         'lantai'            => $kontrak->unit->lantai,
-                        'nomor'             => $kontrak->unit->nomor, 
+                        'nomor'             => $kontrak->unit->nomor,
                         'alamat_lokasi'     => $kontrak->unit->gedung->lokasi->alamat_lokasi,
                         'luas_usaha'        => $kontrak->luas_usaha ? $kontrak->luas_usaha : '-',
                         'total_harga'       => number_format($totalHarga, 0, ',', '.'),
-                        'total_harga_eja'   => ucwords(terbilang($totalHarga)).' Rupiah',
+                        'total_harga_eja'   => ucwords(terbilang($totalHarga)) . ' Rupiah',
                         'harga_sewa'        => number_format($kontrak->harga_sewa, 0, ',', '.'), // 'harga_sewa' diambil dari input
                         'harga_air'        => $kontrak->harga_air ? number_format($kontrak->harga_air, 0, ',', '.') : '-',
                     ]);
@@ -464,8 +313,8 @@ class KontrakController extends Controller
                         );
                     }
                     $convert->convertTo($kontrakId . '.pdf');
-                    
-                   
+
+
                     //update dok_kontrak di tabel kontrak
                     $kontrak->dok_kontrak = 'kontrak/' . $kontrakId . '/' . $kontrakId . '.pdf';
                     $kontrak->status_ttd = 1; //set status ttd ke 0 (draft) setiap buat kontrak baru
@@ -496,7 +345,6 @@ class KontrakController extends Controller
     public function edit(Kontrak $kontrak)
     {
         try {
-            // Tambahkan tipe_kontrak_raw untuk mengisi input readonly di frontend
             $kontrak->tipe_kontrak_raw = ($kontrak->tipe_kontrak == 1) ? 'Hunian' : 'RBH';
             return response()->json(['success' => true, 'data' => $kontrak]);
         } catch (\Exception $e) {
@@ -566,7 +414,7 @@ class KontrakController extends Controller
             // Tipe kontrak dari form adalah string 'Hunian' atau 'RBH', ubah ke integer
             $data['tipe_kontrak'] = ($request->tipe_kontrak == 'Hunian') ? 1 : 2;
             $data['status_kontrak'] = 1; // Selalu 1 untuk kontrak aktif
-            unset($data['masa_kontrak']); 
+            unset($data['masa_kontrak']);
             unset($data['_method']);
 
             $kontrak->update($data);
@@ -586,9 +434,8 @@ class KontrakController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function destroy(Kontrak $kontrak)
-     {
+    {
         try {
-            // Mulai transaksi database untuk memastikan operasi atomik
             DB::beginTransaction();
 
             // Periksa apakah ada nama file dokumen kontrak yang tersimpan
@@ -605,24 +452,23 @@ class KontrakController extends Controller
             }
 
             // Lakukan soft delete pada model Kontrak
-            $kontrak->delete(); 
+            $kontrak->delete();
 
             // Komit transaksi jika semua operasi berhasil
             DB::commit();
 
             return response()->json([
-                'success' => true, 
+                'success' => true,
                 'message' => 'Data kontrak, file, dan folder berhasil dihapus.'
             ]);
-
         } catch (\Exception $e) {
             // Rollback transaksi jika terjadi kesalahan
             DB::rollback();
-            
+
             Log::error('Error deleting kontrak: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            
+
             return response()->json([
-                'success' => false, 
+                'success' => false,
                 'message' => 'Terjadi kesalahan saat menghapus data kontrak: ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -636,7 +482,6 @@ class KontrakController extends Controller
     public function getUnitOptions()
     {
         try {
-            // Ambil unit yang belum memiliki kontrak aktif (status_jual = 1)
             $units = Unit::select(
                 'unit.id',
                 'unit.nomor',
@@ -645,13 +490,13 @@ class KontrakController extends Controller
                 'gedung.nama_gedung as gedung_nama',
                 'lokasi.nama_lokasi as lokasi_nama'
             )
-            ->join('gedung', 'unit.gedung_id', '=', 'gedung.id')
-            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
-            ->where('unit.status_jual', '1') // Hanya unit yang tersedia
-            ->whereDoesntHave('kontrak', function ($query) {
-                $query->where('status_kontrak', 1); // Tidak memiliki kontrak aktif
-            })
-            ->get();
+                ->join('gedung', 'unit.gedung_id', '=', 'gedung.id')
+                ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
+                ->where('unit.status_jual', '1') // Hanya unit yang tersedia
+                ->whereDoesntHave('kontrak', function ($query) {
+                    $query->where('status_kontrak', 1); // Tidak memiliki kontrak aktif
+                })
+                ->get();
 
             return response()->json(['success' => true, 'data' => $units]);
         } catch (\Exception $e) {
@@ -668,12 +513,12 @@ class KontrakController extends Controller
      */
     public function getUnitDetails($unitId)
     {
-         try {
+        try {
             $unit = Unit::find($unitId);
             if ($unit) {
                 // Perbaiki logika konversi dengan membersihkan string
                 $tipe_unit_cleaned = strtolower(trim($unit->tipe_unit));
-                
+
                 // Konversi tipe_unit (string) menjadi tipe_kontrak (integer)
                 $tipe_kontrak_int = ($tipe_unit_cleaned == "hunian") ? 1 : 2;
 
@@ -720,28 +565,22 @@ class KontrakController extends Controller
 
             // Dapatkan ID penghuni yang ada di kedua daftar (intersection)
             $excludedIds = $penghuniWithTipe1->intersect($penghuniWithTipe2)->toArray();
-            // -------------------------------------------------------------------------
-            
+
             $query = Penghuni::select('id', 'nama', 'nik', 'nik_hmac');
-            
-            // Tambahkan kondisi untuk mengecualikan penghuni yang sudah memiliki dua kontrak aktif
+
             $query->whereNotIn('id', $excludedIds);
 
-            // Logika baru untuk menangani pencarian dan pemuatan awal
             if (!empty($search)) {
-                // Hashing input pencarian menggunakan helper function kustom
-                $hashedSearch = hmac($search);
-                
+                $hashedSearch = generateHmac($search);
+
                 // Pastikan hashing berhasil sebelum melakukan pencarian
                 if ($hashedSearch) {
-                    // Hanya mencari berdasarkan NIK yang di-hash
                     $query->where('nik_hmac', $hashedSearch)
-                          ->limit(20); // Batasi hasil pencarian
+                        ->limit(20);
                 } else {
                     // Jika gagal hash, kembalikan hasil kosong
                     return response()->json(['success' => true, 'data' => []]);
                 }
-                
             } elseif (!empty($ids)) {
                 // Jika tidak ada pencarian, tapi ada IDs, muat data berdasarkan IDs
                 $query->whereIn('id', $ids);
@@ -762,7 +601,6 @@ class KontrakController extends Controller
             })->toArray();
 
             return response()->json(['success' => true, 'data' => $results]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching penghuni options for contract: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => 'Gagal memuat opsi penghuni: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -782,7 +620,7 @@ class KontrakController extends Controller
 
             // Hitung selisih dalam hari
             $masaKontrakBerjalan = $tglAwal->diffInDays($tglKeluar);
-            
+
             $kontrak->update([
                 'status_kontrak' => 0,
                 'tgl_keluar' => $validated['tgl_keluar'],
@@ -791,7 +629,7 @@ class KontrakController extends Controller
                 // Anda bisa menyimpannya di sini.
                 // Contoh: 'masa_kontrak_berjalan' => $masaKontrakBerjalan,
             ]);
-            
+
             Log::info("Kontrak #{$kontrak->id} diputus. Masa kontrak berjalan: {$masaKontrakBerjalan} hari.");
 
             DB::commit();
@@ -801,7 +639,6 @@ class KontrakController extends Controller
                 'message' => 'Kontrak berhasil diputus!',
                 'masa_kontrak_berjalan' => $masaKontrakBerjalan,
             ]);
-
         } catch (ValidationException $e) {
             DB::rollBack();
             return response()->json([

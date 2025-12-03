@@ -19,7 +19,17 @@ class PendaftaranController extends Controller
      */
     public function index()
     {
-        return view('pendaftaran.index');
+        $pendaftar = Pendaftaran::all();
+
+        if ($pendaftar->isEmpty()) {
+            return response()->json([
+                'gagal' => 'Data kosong',
+            ]);
+        }
+        return response()->json([
+            'sukses' => 'Data ditemukan',
+            'data' => $pendaftar
+        ]);
     }
     public function index_pengelola()
     {
@@ -260,8 +270,27 @@ class PendaftaranController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $pendaftar = Pendaftaran::findOrFail($id);
+
+            if (!$pendaftar) {
+                return response()->json([
+                    'gagal' => 'Pendaftar tidak ditemukan'
+                ]);
+            }
+
+            $pendaftar->delete();
+            return response()->json([
+                'sukses' => 'Pendaftar berhasil dihapus',
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Pendaftar tidak ditemukan'
+            ]);
+        }
     }
 }

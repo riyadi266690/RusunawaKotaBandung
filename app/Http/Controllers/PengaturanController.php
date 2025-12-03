@@ -35,32 +35,25 @@ class PengaturanController extends Controller
      */
     public function ajax_DTLokasi(Request $request)
     {
-        $query = Lokasi::query()
-            ->select('id', 'nama_lokasi', 'kepala_lokasi', 'alamat_lokasi')
+        $search = $request->input('search');
+
+        $query = Lokasi::select('id', 'nama_lokasi', 'kepala_lokasi', 'alamat_lokasi')
             ->orderBy('id', 'asc');
-        
-        return DataTables::of($query)
-            ->addColumn('lokasi', function($lokasi){
-                return $lokasi->nama_lokasi;
-            })
-            ->addColumn('penanggung_jawab', function($lokasi){
-                return $lokasi->kepala_lokasi;
-            })
-            ->addColumn('alamat', function($lokasi){
-                return $lokasi->alamat_lokasi;
-            })
-            ->addColumn('aksi', function($lokasi){
-                return '<div class="btn-group">
-                            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
-                            <div class="dropdown-menu">                                                          
-                                <a class="dropdown-item" href="#" onclick="editLokasi(' . $lokasi->id . ')">Edit</a>
-                                <a class="dropdown-item" href="#" onclick="hapusLokasi(' . $lokasi->id . ')">Hapus</a>                        
-                            </div>
-                        </div>';
-            })
-            ->rawColumns(['aksi'])
-            ->toJson();
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama_lokasi', 'like', "%{$search}%")
+                    ->orWhere('kepala_lokasi', 'like', "%{$search}%")
+                    ->orWhere('alamat_lokasi', 'like', "%{$search}%");
+            });
+        }
+
+        return response()->json([
+            'sukses' => true,
+            'data' => $query->get()
+        ]);
     }
+
 
     /**
      * Menyimpan data lokasi baru.
@@ -201,26 +194,24 @@ class PengaturanController extends Controller
      */
     public function ajax_DTGedung(Request $request)
     {
+
+        $search = $request->input('search');
         $query = Gedung::query()
             ->select('gedung.id', 'gedung.nama_gedung', 'gedung.tipe_gedung', 'lokasi.nama_lokasi as lokasi')
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
             ->orderBy('gedung.id', 'asc');
-        
-        return DataTables::of($query)
-            ->addColumn('lokasi', function($gedung){
-                return $gedung->lokasi; // Sudah di-join dan di-alias
-            })
-            ->addColumn('aksi', function($gedung){
-                return '<div class="btn-group">
-                            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
-                            <div class="dropdown-menu">                                                          
-                                <a class="dropdown-item" href="#" onclick="editGedung(' . $gedung->id . ')">Edit</a>
-                                <a class="dropdown-item" href="#" onclick="hapusGedung(' . $gedung->id . ')">Hapus</a>                        
-                            </div>
-                        </div>';
-            })
-            ->rawColumns(['aksi'])
-            ->toJson();
+
+        if (!empty($request)) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nama_gedung', 'like', ' %{$search}%')
+                    ->orWhere('tipe_gedung', 'like', '%{$search}%');
+            });
+        }
+
+        return response()->json([
+            'sukses' => true,
+            'data' => $query->get()
+        ]);
     }
 
     /**
@@ -237,7 +228,7 @@ class PengaturanController extends Controller
             'lokasi_id' => 'required|exists:lokasi,id',
         ], [
             'nama_gedung.required' => 'Nama gedung harus diisi.',
-            'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.', // Pesan error diperbarui
+            'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.',
             'tipe_gedung.required' => 'Tipe gedung harus diisi.',
             'lokasi_id.required' => 'Lokasi harus dipilih.',
             'lokasi_id.exists' => 'Lokasi tidak valid.',
@@ -348,10 +339,10 @@ class PengaturanController extends Controller
     {
         try {
             $gedung = Gedung::select('gedung.id', 'gedung.nama_gedung', 'lokasi.nama_lokasi as lokasi_nama')
-                            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
-                            ->get();
+                ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
+                ->get();
             // Map data untuk format yang lebih mudah di frontend
-            $formattedGedung = $gedung->map(function($item) {
+            $formattedGedung = $gedung->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'nama_gedung' => $item->nama_gedung,
@@ -376,11 +367,11 @@ class PengaturanController extends Controller
     {
         $query = Unit::query()
             ->select(
-                'unit.id', 
-                'unit.nomor', 
-                'unit.lantai', 
-                'unit.tipe_unit', 
-                'unit.status_jual', 
+                'unit.id',
+                'unit.nomor',
+                'unit.lantai',
+                'unit.tipe_unit',
+                'unit.status_jual',
                 'gedung.nama_gedung as gedung_nama',
                 'lokasi.nama_lokasi as lokasi_nama' // Tambahkan ini
             )
@@ -388,13 +379,13 @@ class PengaturanController extends Controller
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id') // Tambahkan join ke lokasi
             ->orderBy('unit.id', 'desc');
         return DataTables::of($query)
-            ->addColumn('gedung', function($unit){
-                return $unit->lokasi_nama . ' ' . $unit->gedung_nama; 
+            ->addColumn('gedung', function ($unit) {
+                return $unit->lokasi_nama . ' ' . $unit->gedung_nama;
             })
-            ->addColumn('status_jual', function($unit){
+            ->addColumn('status_jual', function ($unit) {
                 return $unit->status_jual == '1' ? 'Tersedia' : 'Dalam Perbaikan';
             })
-            ->addColumn('aksi', function($unit){
+            ->addColumn('aksi', function ($unit) {
                 return '<div class="btn-group">
                             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
                             <div class="dropdown-menu">                                                          
@@ -413,7 +404,7 @@ class PengaturanController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-   public function storeUnit(Request $request)
+    public function storeUnit(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'gedung_id' => 'required|exists:gedung,id',
@@ -424,8 +415,8 @@ class PengaturanController extends Controller
                 // Aturan unik kompleks: nomor harus unik untuk kombinasi gedung_id, lantai, dan tipe_unit
                 \Illuminate\Validation\Rule::unique('unit')->where(function ($query) use ($request) {
                     return $query->where('gedung_id', $request->gedung_id)
-                                 ->where('lantai', $request->lantai)
-                                 ->where('tipe_unit', $request->tipe_unit);
+                        ->where('lantai', $request->lantai)
+                        ->where('tipe_unit', $request->tipe_unit);
                 })
             ],
             'lantai' => 'required|integer|min:1|max:5',
@@ -499,8 +490,8 @@ class PengaturanController extends Controller
                 // Aturan unik kompleks: nomor harus unik untuk kombinasi gedung_id, lantai, dan tipe_unit, kecuali untuk unit ini sendiri
                 \Illuminate\Validation\Rule::unique('unit')->where(function ($query) use ($request) {
                     return $query->where('gedung_id', $request->gedung_id)
-                                 ->where('lantai', $request->lantai)
-                                 ->where('tipe_unit', $request->tipe_unit);
+                        ->where('lantai', $request->lantai)
+                        ->where('tipe_unit', $request->tipe_unit);
                 })->ignore($unit->id)
             ],
             'lantai' => 'required|integer|min:1|max:5',

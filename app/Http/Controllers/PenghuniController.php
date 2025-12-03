@@ -50,7 +50,7 @@ class PenghuniController extends Controller
             $keyword = trim($request->search);
 
             // HMAC keyword
-            $keywordHmac = hmac($keyword);
+            $keywordHmac = generateHmac($keyword);
 
             // Pencarian cocok dengan HMAC
             $query->where(function ($q) use ($keywordHmac) {
@@ -177,9 +177,8 @@ class PenghuniController extends Controller
             $penghuni->jenis_kelamin = $request->jenis_kelamin;
             $penghuni->status_kawin = $request->status_kawin;
             $penghuni->agama = $request->agama;
-            $penghuni->pekerjaan = $request->pekerjaan; // Simpan pekerjaan
-            $penghuni->alamat = $request->alamat;     // Simpan alamat
-            // created_by dan updated_by akan otomatis diisi oleh model boot method
+            $penghuni->pekerjaan = $request->pekerjaan;
+            $penghuni->alamat = $request->alamat;
             $penghuni->save();
 
             DB::commit();
@@ -252,8 +251,6 @@ class PenghuniController extends Controller
     {
         // Validasi input dari form
         $validator = Validator::make($request->all(), [
-            // NIK tidak divalidasi required karena disabled di frontend saat edit
-            // 'nik' => 'required|string|max:255',
             'nama' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'tgl_lahir' => 'required|date',
@@ -265,7 +262,6 @@ class PenghuniController extends Controller
             'pekerjaan' => 'nullable|string|max:255',
             'alamat' => 'nullable|string|max:255',
         ], [
-            // 'nik.required' => 'NIK harus diisi',
             'nama.required' => 'Nama harus diisi.',
             'email.required' => 'Email harus diisi.',
             'email.email' => 'Format email tidak valid.',
@@ -297,7 +293,6 @@ class PenghuniController extends Controller
             $emailFormatted = strtolower($request->email);
 
             // Hashing data unik yang mungkin berubah (No. Telp, Email)
-            // NIK tidak di-hash ulang karena tidak diubah
             $namaHmac = generateHmac($request->nama);
             $noTlpHmac = generateHmac($request->no_tlp);
             $emailHmac = generateHmac($emailFormatted);
@@ -328,7 +323,6 @@ class PenghuniController extends Controller
             }
 
             // Update data di database
-            // NIK tidak diubah
             $penghuni->nama = $namaFormatted;
             $penghuni->email = $emailFormatted;
             $penghuni->email_hmac = $emailHmac;
@@ -364,7 +358,7 @@ class PenghuniController extends Controller
             DB::beginTransaction();
 
             $penghuni = Penghuni::findOrFail($id);
-            $penghuni->delete(); // Menggunakan soft delete jika diaktifkan di model
+            $penghuni->delete();
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data penghuni berhasil dihapus.']);

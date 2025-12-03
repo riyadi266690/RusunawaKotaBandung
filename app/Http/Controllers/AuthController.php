@@ -66,7 +66,7 @@ class AuthController extends Controller
     {
         $user = $request->user();
 
-        // roken
+        // token
         if ($user && $user->currentAccessToken()) {
             $user->currentAccessToken()->delete();
 
