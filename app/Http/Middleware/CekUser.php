@@ -15,18 +15,16 @@ class CekUser
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        $user = Auth::user();
-        $fitur = $request->route()->getName(); // Otomatis ambil dari route name
-        $akses = DB::table('role')
-            ->where('user_id', $user->id)
-            ->where('fitur', $fitur)
-            ->where('akses', 1)
-            ->exists();
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
-        if (!$akses) {
-            return abort(403, 'Akses ditolak untuk fitur: ' . $fitur);
+        if (!in_array(auth()->user()->Role->nama_role, $roles)) {
+            return response()->json([
+                'message' => 'Forbidden'
+            ], 403);
         }
 
         return $next($request);

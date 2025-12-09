@@ -11,28 +11,45 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Auth;
+
+use function PHPUnit\Framework\isEmpty;
 
 class PengaturanController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    // Lokasi
+    public function allDataLokasi()
     {
-        return view('pengaturan.index');
+        $user = Auth::user();
+
+        if ($user->role_id == 1) {
+            $lokasi = Lokasi::all();
+
+            return response()->json([
+                'success' => true,
+                'data' => $lokasi
+            ]);
+        }
+
+        $lokasi = Lokasi::where('id_user', $user->id)->get();
+
+        if ($lokasi->isEmpty()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Belum ada data lokasi.',
+                'data' => []
+            ]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $lokasi
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    // --- LOGIKA CRUD LOKASI ---
 
-    /**
-     * Memproses data lokasi untuk DataTables.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function ajax_DTLokasi(Request $request)
     {
         $search = $request->input('search');
@@ -54,13 +71,6 @@ class PengaturanController extends Controller
         ]);
     }
 
-
-    /**
-     * Menyimpan data lokasi baru.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function storeLokasi(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -83,7 +93,13 @@ class PengaturanController extends Controller
 
         try {
             DB::beginTransaction();
-            Lokasi::create($request->all());
+            $userId = Auth::id();
+            Lokasi::create([
+                'nama_lokasi' => $request->nama_lokasi,
+                'kepala_lokasi' => $request->kepala_lokasi,
+                'alamat_lokasi' => $request->alamat_lokasi,
+                'id_user' => $userId
+            ]);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data lokasi berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -93,29 +109,6 @@ class PengaturanController extends Controller
         }
     }
 
-    /**
-     * Menampilkan data lokasi untuk diedit.
-     *
-     * @param  \App\Models\Lokasi  $lokasi
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function editLokasi(Lokasi $lokasi)
-    {
-        try {
-            return response()->json(['success' => true, 'data' => $lokasi]);
-        } catch (\Exception $e) {
-            Log::error('Error fetching lokasi for edit: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['success' => false, 'message' => 'Gagal mengambil data lokasi: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
-     * Memperbarui data lokasi.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Lokasi  $lokasi
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function updateLokasi(Request $request, Lokasi $lokasi)
     {
         $validator = Validator::make($request->all(), [
@@ -133,32 +126,48 @@ class PengaturanController extends Controller
             return response()->json([
                 'success' => false,
                 'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            ], 422);
+        }
+
+        if ($lokasi->id_user !== Auth::id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki akses untuk mengubah lokasi ini.'
+            ], 403);
         }
 
         try {
             DB::beginTransaction();
-            $lokasi->update($request->all());
+
+            $lokasi->update([
+                'nama_lokasi' => $request->nama_lokasi,
+                'kepala_lokasi' => $request->kepala_lokasi,
+                'alamat_lokasi' => $request->alamat_lokasi,
+            ]);
+
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Data lokasi berhasil diperbarui.']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data lokasi berhasil diperbarui.'
+            ]);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error('Error updating lokasi: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat memperbarui data lokasi: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            Log::error('Error updating lokasi: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    /**
-     * Menghapus data lokasi.
-     *
-     * @param  \App\Models\Lokasi  $lokasi
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function destroyLokasi(Lokasi $lokasi)
     {
         try {
             DB::beginTransaction();
-            $lokasi->delete(); // Ini akan menghapus cascading gedung yang terkait karena onDelete('cascade')
+            $lokasi->delete();
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data lokasi dan gedung terkait berhasil dihapus.']);
         } catch (\Exception $e) {
@@ -168,11 +177,6 @@ class PengaturanController extends Controller
         }
     }
 
-    /**
-     * Mengambil daftar lokasi untuk dropdown.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getLokasiOptions()
     {
         try {
@@ -184,18 +188,43 @@ class PengaturanController extends Controller
         }
     }
 
-    // --- LOGIKA CRUD GEDUNG ---
+    // --- GEDUNG ---
+    function allDataGedung()
+    {
+        $user = Auth::user();
+        $lokasiUser = Lokasi::where('id_user', $user->id)->pluck('id');
 
-    /**
-     * Memproses data gedung untuk DataTables.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+
+        // $lokasiUser = $user->lokasi()->pluck('id');
+
+        if ($user->role_id == 1) {
+            $gedung = Gedung::with('lokasi')->get();
+            return response()->json([
+                'sukses' => true,
+                'data' => $gedung
+            ]);
+        }
+
+        $gedung = Gedung::with('lokasi')
+            ->whereIn('lokasi_id', $lokasiUser)
+            ->get();
+
+        if ($gedung->isEmpty()) {
+            return response()->json([
+                'sukses' => false,
+                'message' => 'Data gedung tidak ditemukan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'sukses' => true,
+            'data' => $gedung
+        ]);
+    }
+
+
     public function ajax_DTGedung(Request $request)
     {
-
-        $search = $request->input('search');
         $query = Gedung::query()
             ->select('gedung.id', 'gedung.nama_gedung', 'gedung.tipe_gedung', 'lokasi.nama_lokasi as lokasi')
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
@@ -208,18 +237,14 @@ class PengaturanController extends Controller
             });
         }
 
+        $data = $query->get();
+
         return response()->json([
             'sukses' => true,
-            'data' => $query->get()
+            'data' => $data
         ]);
     }
 
-    /**
-     * Menyimpan data gedung baru.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function storeGedung(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -346,7 +371,7 @@ class PengaturanController extends Controller
                 return [
                     'id' => $item->id,
                     'nama_gedung' => $item->nama_gedung,
-                    'lokasi' => $item->lokasi_nama // Menggunakan alias yang sudah di-join
+                    'lokasi' => $item->lokasi_nama
                 ];
             });
             return response()->json(['success' => true, 'data' => $formattedGedung]);
@@ -355,14 +380,25 @@ class PengaturanController extends Controller
             return response()->json(['success' => false, 'message' => 'Gagal memuat opsi gedung: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    // --- LOGIKA CRUD UNIT ---
+    // --- UNIT ---
 
-    /**
-     * Memproses data unit untuk DataTables.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
+    function allDataUnit()
+    {
+        $user = Auth::user();
+        $lokasiUser = Lokasi::where('id_user', $user->id)->pluck('id');
+        $unit = Unit::with('gedung')->whereIn('gedung.lokasi_id', $lokasiUser)->get();
+
+        if ($unit->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data unit tidak ditemukan.'
+            ], 404);
+        }
+        return response()->json([
+            'success' => true,
+            'data' => $unit
+        ]);
+    }
     public function ajax_DTUnit(Request $request)
     {
         $query = Unit::query()

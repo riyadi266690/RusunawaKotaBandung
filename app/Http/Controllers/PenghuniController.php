@@ -18,7 +18,11 @@ class PenghuniController extends Controller
      */
     public function index()
     {
-        return view('penghuni.index'); // Pastikan Anda memiliki view 'penghuni.index'
+        $penghuni = Penghuni::all();
+        return response()->json([
+            'success' => true,
+            'data' => $penghuni
+        ]);
     }
 
     public function ajax_DTPenghuni(Request $request)
@@ -52,7 +56,7 @@ class PenghuniController extends Controller
             // HMAC keyword
             $keywordHmac = generateHmac($keyword);
 
-            // Pencarian cocok dengan HMAC
+            // Pencarian cocok dengan HMACN
             $query->where(function ($q) use ($keywordHmac) {
                 $q->where('nik_hmac', $keywordHmac)
                     ->orWhere('no_tlp_hmac', $keywordHmac)

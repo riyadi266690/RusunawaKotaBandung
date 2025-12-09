@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pendaftaran;
-use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,6 +25,7 @@ class PendaftaranController extends Controller
                 'gagal' => 'Data kosong',
             ]);
         }
+
         return response()->json([
             'sukses' => 'Data ditemukan',
             'data' => $pendaftar
@@ -158,19 +158,10 @@ class PendaftaranController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      */
     public function updateTanggalWawancara(Request $request, $id)
     {
-        // Validasi data yang masuk dari AJAX
         $validator = Validator::make($request->all(), [
             'tgl_wawancara' => 'required|date',
             'tgl_final' => 'nullable|date',

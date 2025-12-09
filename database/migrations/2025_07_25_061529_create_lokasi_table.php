@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama_lokasi');
             $table->string('kepala_lokasi');
             $table->string('alamat_lokasi');
+            $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });
     }
