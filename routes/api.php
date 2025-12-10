@@ -21,7 +21,7 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::delete('/deletePendaftar/{id}', [PendaftaranController::class, 'destroy']);
 
     // penghuni
-    Route::get('/dataPenghuni', [PenghuniController::class, 'index']);
+    Route::get('/allDataPenghuni', [PenghuniController::class, 'index']);
     Route::post('/dataPenghuni/{data}', [PenghuniController::class, 'ajax_DTPenghuni']);
     Route::post('/storePenghuni', [PenghuniController::class, 'store']);
     Route::put('/updatePenghuni/{id}', [PenghuniController::class, 'update']);
@@ -29,7 +29,8 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
 
     // kontrak
     // aktif
-    Route::get('/dataKontrak', [KontrakController::class, 'kontrakAktif']);
+    Route::get('/dataKontrakAktif', [KontrakController::class, 'kontrakAktif']);
+    Route::post('/storeKontrak', [KontrakController::class, 'store']);
     Route::post('/dataKontrak/{data}', [KontrakController::class, 'ajax_DTKontrakAktif']);
     Route::delete('/deleteKontrak/{id}', [KontrakController::class, 'destroy']);
     Route::put('/updateKontrak/{id}', [KontrakController::class, 'update']);
@@ -40,7 +41,7 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
 
     // pengaturan
     // lokasi
-    Route::get('/dataLokasiAll', [PengaturanController::class, 'allDataLokasi']);
+    Route::get('/allDataLokasi', [PengaturanController::class, 'allDataLokasi']);
     Route::post('/storeLokasi', [PengaturanController::class, 'storeLokasi']);
     Route::post('/dataLokasi/{request}', [PengaturanController::class, 'ajax_DTLokasi']);
     Route::put('/updateLokasi/{lokasi}', [PengaturanController::class, 'updateLokasi']);
@@ -52,4 +53,11 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::post('/dataGedung/{request}', [PengaturanController::class, 'ajax_DTGedung']);
     Route::put('/updateGedung/{gedung}', [PengaturanController::class, 'updateGedung']);
     Route::delete('/deleteGedung/{gedung}', [PengaturanController::class, 'destroyGedung']);
+
+    // unit
+    Route::get('/dataUnitAll', [PengaturanController::class, 'allDataUnit']);
+    Route::post('/storeUnit', [PengaturanController::class, 'storeUnit']);
+    Route::post('/dataUnit/{request}', [PengaturanController::class, 'ajax_DTUnit']);
+    Route::put('/updateUnit/{unit}', [PengaturanController::class, 'updateUnit']);
+    Route::delete('/deleteUnit/{unit}', [PengaturanController::class, 'destroyUnit']);
 });

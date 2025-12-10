@@ -386,7 +386,12 @@ class PengaturanController extends Controller
     {
         $user = Auth::user();
         $lokasiUser = Lokasi::where('id_user', $user->id)->pluck('id');
-        $unit = Unit::with('gedung')->whereIn('gedung.lokasi_id', $lokasiUser)->get();
+        $unit = Unit::with('gedung')
+            ->whereHas('gedung', function ($query) use ($lokasiUser) {
+                $query->whereIn('lokasi_id', $lokasiUser);
+            })
+            ->get();
+
 
         if ($unit->isEmpty()) {
             return response()->json([

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
-use Yajra\DataTables\Facades\DataTables;
 
 class PenghuniController extends Controller
 {
@@ -74,20 +73,12 @@ class PenghuniController extends Controller
             'data' => $data
         ]);
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // --- LOGGING CSRF TOKEN ---
         Log::info('CSRF Token from Request (store): ' . $request->input('_token'));
         Log::info('CSRF Token from Session (store): ' . Session::token());
         // --- END LOGGING ---

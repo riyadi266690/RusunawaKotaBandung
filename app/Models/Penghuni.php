@@ -12,51 +12,51 @@ class Penghuni extends Model
     protected $table = 'penghuni';
 
     protected $guarded = [];
-    
-     /**
+
+    /**
      * Dapatkan atribut nama.
      * Secara otomatis mendekripsi nilai saat diakses.
      */
-  protected function nama(): Attribute
-    {
-        return Attribute::make(
-            // Fungsi get akan dijalankan setiap kali atribut 'nama' diakses
-            get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
-        );
-    }
-     /**
+    //   protected function nama(): Attribute
+    //     {
+    //         return Attribute::make(
+    //             // Fungsi get akan dijalankan setiap kali atribut 'nama' diakses
+    //             get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
+    //         );
+    //     }
+    /**
      * Dapatkan atribut nik.
      * Secara otomatis mendekripsi nilai saat diakses.
      */
-    protected function nik(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
-        );
-    }
-    
+    // protected function nik(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
+    //     );
+    // }
+
     /**
      * Dapatkan atribut no_tlp.
      * Secara otomatis mendekripsi nilai saat diakses.
      */
-    protected function noTlp(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
-        );
-    }
+    // protected function noTlp(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
+    //     );
+    // }
 
     /**
      * Dapatkan atribut email.
      * Secara otomatis mendekripsi nilai saat diakses.
      */
-    protected function email(): Attribute
-    {
-        return Attribute::make(
-            get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
-        );
-    }
-    
+    // protected function email(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn ($value) => $value ? unsealNames([$value])[$value] ?? '' : '',
+    //     );
+    // }
+
     // app/Models/Penghuni.php
     public function kontrakAsPenghuni1()
     {
@@ -90,7 +90,7 @@ class Penghuni extends Model
     {
         return $this->belongsTo(User::class, 'deleted_by');
     }
-     protected static function boot()
+    protected static function boot()
     {
         parent::boot();
 
@@ -105,7 +105,7 @@ class Penghuni extends Model
         static::deleting(function ($model) {
             if (Auth::check()) {
                 $model->deleted_by = Auth::id();
-            } 
+            }
             // Tidak perlu memanggil $model->save() di sini.
             // Laravel akan menyimpannya saat proses soft delete.
         });
