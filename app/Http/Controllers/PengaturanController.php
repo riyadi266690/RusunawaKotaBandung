@@ -17,7 +17,6 @@ use function PHPUnit\Framework\isEmpty;
 
 class PengaturanController extends Controller
 {
-
     // Lokasi
     public function allDataLokasi()
     {
@@ -111,6 +110,7 @@ class PengaturanController extends Controller
 
     public function updateLokasi(Request $request, Lokasi $lokasi)
     {
+        $user = Auth::user();
         $validator = Validator::make($request->all(), [
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,' . $lokasi->id,
             'kepala_lokasi' => 'required|string|max:255',
@@ -129,7 +129,7 @@ class PengaturanController extends Controller
             ], 422);
         }
 
-        if ($lokasi->id_user !== Auth::id()) {
+        if ($user->role_id !== 1 && $lokasi->id_user !== $user->id) {
             return response()->json([
                 'success' => false,
                 'message' => 'Anda tidak memiliki akses untuk mengubah lokasi ini.'
@@ -165,6 +165,14 @@ class PengaturanController extends Controller
 
     public function destroyLokasi(Lokasi $lokasi)
     {
+        $user = Auth::user();
+
+        if ($user->role_id !== 1 && $lokasi->id_user !== $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki akses untuk menghapus lokasi ini.'
+            ]);
+        }
         try {
             DB::beginTransaction();
             $lokasi->delete();
@@ -194,10 +202,7 @@ class PengaturanController extends Controller
         $user = Auth::user();
         $lokasiUser = Lokasi::where('id_user', $user->id)->pluck('id');
 
-
-        // $lokasiUser = $user->lokasi()->pluck('id');
-
-        if ($user->role_id == 1) {
+        if ($user->role_id === 1) {
             $gedung = Gedung::with('lokasi')->get();
             return response()->json([
                 'sukses' => true,
@@ -279,22 +284,6 @@ class PengaturanController extends Controller
     }
 
     /**
-     * Menampilkan data gedung untuk diedit.
-     *
-     * @param  \App\Models\Gedung  $gedung
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function editGedung(Gedung $gedung)
-    {
-        try {
-            return response()->json(['success' => true, 'data' => $gedung]);
-        } catch (\Exception $e) {
-            Log::error('Error fetching gedung for edit: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return response()->json(['success' => false, 'message' => 'Gagal mengambil data gedung: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    /**
      * Memperbarui data gedung.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -303,13 +292,14 @@ class PengaturanController extends Controller
      */
     public function updateGedung(Request $request, Gedung $gedung)
     {
+        $user = Auth::user();
         $validator = Validator::make($request->all(), [
             'nama_gedung' => 'required|string|max:255|unique:gedung,nama_gedung,' . $gedung->id . ',id,lokasi_id,' . $request->lokasi_id,
             'tipe_gedung' => 'required|string|max:255',
             'lokasi_id' => 'required|exists:lokasi,id',
         ], [
             'nama_gedung.required' => 'Nama gedung harus diisi.',
-            'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.', // Pesan error diperbarui
+            'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.',
             'tipe_gedung.required' => 'Tipe gedung harus diisi.',
             'lokasi_id.required' => 'Lokasi harus dipilih.',
             'lokasi_id.exists' => 'Lokasi tidak valid.',
@@ -320,6 +310,13 @@ class PengaturanController extends Controller
                 'success' => false,
                 'errors' => $validator->errors()
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if ($user->role_id !== 1 && $user->id !== $gedung->Lokasi->id_user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk memperbarui data gedung.'
+            ], Response::HTTP_FORBIDDEN);
         }
 
         try {
@@ -334,14 +331,15 @@ class PengaturanController extends Controller
         }
     }
 
-    /**
-     * Menghapus data gedung.
-     *
-     * @param  \App\Models\Gedung  $gedung
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroyGedung(Gedung $gedung)
+    function destroyGedung(Gedung $gedung)
     {
+        $user = Auth::user();
+        if ($user->role_id !== 1 && $user->id !== $gedung->lokasi->id_user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki izin untuk menghapus data gedung.'
+            ], Response::HTTP_FORBIDDEN);
+        }
         try {
             DB::beginTransaction();
             $gedung->delete();
