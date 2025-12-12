@@ -6,7 +6,7 @@ use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\PengaturanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PenghuniController;
-
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/authenticate', [AuthController::class, 'authenticate']);
@@ -63,4 +63,11 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::post('/storeUnit', [PengaturanController::class, 'storeUnit']);
     Route::put('/updateUnit/{unit}', [PengaturanController::class, 'updateUnit']);
     Route::delete('/deleteUnit/{unit}', [PengaturanController::class, 'destroyUnit']);
+});
+
+Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->group(function () {
+    Route::get('/dataUser', [UserController::class, 'index']);
+    Route::post('/storeUser', [UserController::class, 'store']);
+    Route::put('/updateUser/{user}', [UserController::class, 'update']);
+    Route::delete('/deleteUser/{user}', [UserController::class, 'destroy']);
 });
