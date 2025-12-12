@@ -334,7 +334,7 @@ namespace App\Models {
      * @property string $nama_pihak1
      * @property int $status_kontrak
      * @property int|null $masa_kontrak
-     * @property string $tgl_keluar
+     * @property string|null $tgl_keluar
      * @property string $tgl_akhir
      * @property string $tgl_awal
      * @property int $tipe_kontrak
@@ -342,10 +342,7 @@ namespace App\Models {
      * @property int $unit_id
      * @property int $id
      * @property-read \App\Models\Unit $unit
-     * @property-read \App\Models\Penghuni $penghuni1
-     * @property-read \App\Models\Penghuni $penghuni2
-     * @property-read \App\Models\Penghuni $penghuni3
-     * @property-read \App\Models\Penghuni $penghuni4
+     * @property-read \App\Models\Penghuni $penghuni
      * @property-read \App\Models\User $creator
      * @property-read \App\Models\User $updater
      * @property-read \App\Models\User $deleter

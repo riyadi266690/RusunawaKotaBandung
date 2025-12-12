@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('nama');;
             $table->string('telp_pendaftar');
             $table->string('suket');
-            $table->integer('status_daftar'); //1menunggu, 2 wawancara, 3 diterima, 4 ditolak
+            $table->integer('status_daftar');
             $table->date('tgl_daftar');
             $table->date('tgl_wawancara')->nullable();
             $table->date('tgl_final')->nullable();

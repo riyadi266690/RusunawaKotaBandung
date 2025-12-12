@@ -55,7 +55,6 @@ class PendaftaranController extends Controller
 
         $pendaftars = $query->get();
 
-        // Kumpulkan semua nama dan telp terenkripsi
         $encryptedTexts = $pendaftars->pluck('nama')->merge($pendaftars->pluck('telp_pendaftar'))->toArray();
         $decryptedTextsMap = unsealNames($encryptedTexts);
 
@@ -69,6 +68,13 @@ class PendaftaranController extends Controller
             'sukses' => true,
             'data' => $pendaftars
         ]);
+    }
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
     }
 
     /**
@@ -99,24 +105,20 @@ class PendaftaranController extends Controller
         try {
             DB::beginTransaction();
 
-            // Panggil helper untuk membuat HMAC dari nomor telepon untuk pengecekan unik
             $phoneHmac = generateHmac($request->telp_pendaftar);
 
             if (!$phoneHmac) {
                 throw new Exception('Gagal mendapatkan HMAC dari API.');
             }
 
-            // Pengecekan unik secara manual menggunakan HMAC
             $existingPendaftar = Pendaftaran::where('telp_pendaftar_hash', $phoneHmac)->first();
             if ($existingPendaftar) {
                 DB::rollback();
-                // return back()->with('gagal', 'No Telp / WhatsApp sudah terdaftar.')->withInput();
                 return response()->json([
                     'gagal' => 'No Telp / WhatsApp sudah terdaftar.'
                 ]);
             }
 
-            // Simpan file yang diunggah
             $filePath = $request->file('suket')->store('suket', 'public');
 
             $data = new Pendaftaran();
@@ -142,6 +144,13 @@ class PendaftaranController extends Controller
         }
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
 
     /**
      * Update the specified resource in storage.
@@ -201,13 +210,11 @@ class PendaftaranController extends Controller
 
     public function updateTanggalSelesai(Request $request, $id)
     {
-        // Ambil data pendaftar untuk mendapatkan tgl_wawancara
         $pendaftar = Pendaftaran::findOrFail($id);
         $tglWawancara = $pendaftar->tgl_wawancara;
 
-        // Validasi data yang masuk dari AJAX
         $validator = Validator::make($request->all(), [
-            'tgl_final' => 'required|date|after_or_equal:' . $tglWawancara, // Aturan BARU
+            'tgl_final' => 'required|date|after_or_equal:' . $tglWawancara,
             'ket_wawancara' => 'nullable|string',
         ], [
             'tgl_final.required' => 'Tanggal selesai harus diisi.',
@@ -224,7 +231,6 @@ class PendaftaranController extends Controller
         }
 
         try {
-            // Mulai transaksi database
             DB::beginTransaction();
 
             $pendaftar = Pendaftaran::findOrFail($id);
@@ -233,7 +239,6 @@ class PendaftaranController extends Controller
             $pendaftar->status_daftar = 3;
             $pendaftar->save();
 
-            // Jika semua operasi berhasil, commit transaksi
             DB::commit();
 
             return response()->json(['success' => true, 'message' => 'Tanggal dan catatan selesai berhasil diperbarui.']);

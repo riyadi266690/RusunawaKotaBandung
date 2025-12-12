@@ -23,10 +23,7 @@ return new class extends Migration
             $table->integer('status_kontrak');
             $table->string('nama_pihak1');
             $table->integer('status_ttd');
-            $table->foreignId('penghuni_id1')->references('id')->on('penghuni')->onDelete('cascade');
-            $table->foreignId('penghuni_id2')->references('id')->on('penghuni')->onDelete('cascade')->nullable();
-            $table->foreignId('penghuni_id3')->references('id')->on('penghuni')->onDelete('cascade')->nullable();
-            $table->foreignId('penghuni_id4')->references('id')->on('penghuni')->onDelete('cascade')->nullable();
+            $table->foreignId('penghuni')->references('id')->on('penghuni')->onDelete('cascade');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');

@@ -354,6 +354,18 @@ class PengaturanController extends Controller
         }
     }
 
+    public function countUnit()
+    {
+        $unit = Unit::count();
+        if ($unit->isEmpty()) {
+            return response()->json(
+                ['gagal' => 'data tidak ditemukan']
+            );
+        }
+        return response()->json(
+            ['message' => 'data ditemukan', 'data' => $unit]
+        );
+    }
 
     /**
      * Mengambil daftar gedung untuk dropdown.

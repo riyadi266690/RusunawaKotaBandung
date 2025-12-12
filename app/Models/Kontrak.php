@@ -16,30 +16,11 @@ class Kontrak extends Model
         return $this->belongsTo(Unit::class, 'unit_id');
     }
 
-    
-    // Relasi ke Penghuni 1
-    public function penghuni1()
+    // Relasi ke Penghuni 
+    public function penghuni()
     {
-        
+
         return $this->belongsTo(Penghuni::class, 'penghuni_id1');
-    }
-
-    // Relasi ke Penghuni 2 (opsional)
-    public function penghuni2()
-    {
-        return $this->belongsTo(Penghuni::class, 'penghuni_id2');
-    }
-
-    // Relasi ke Penghuni 3 (opsional)
-    public function penghuni3()
-    {
-        return $this->belongsTo(Penghuni::class, 'penghuni_id3');
-    }
-
-    // Relasi ke Penghuni 4 (opsional)
-    public function penghuni4()
-    {
-        return $this->belongsTo(Penghuni::class, 'penghuni_id4');
     }
 
     // Relasi ke User (created_by)
@@ -60,7 +41,6 @@ class Kontrak extends Model
         return $this->belongsTo(User::class, 'deleted_by');
     }
 
-    // Boot method untuk otomatis mengisi created_by, updated_by, dan deleted_by
     protected static function boot()
     {
         parent::boot();
@@ -83,7 +63,7 @@ class Kontrak extends Model
         static::deleting(function ($model) {
             if (Auth::check()) {
                 $model->deleted_by = Auth::id();
-                $model->save(); // Simpan perubahan deleted_by sebelum soft delete
+                $model->save();
             }
         });
     }
