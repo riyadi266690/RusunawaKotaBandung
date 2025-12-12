@@ -226,7 +226,7 @@ class PengaturanController extends Controller
     public function ajax_DTGedung(Request $request)
     {
         $query = Gedung::query()
-            ->select('gedung.id', 'gedung.nama_gedung', 'gedung.tipe_gedung', 'lokasi.nama_lokasi as lokasi')
+            ->select('gedung.id', 'gedung.nama_gedung', 'gedung.tipe_gedung', 'gedung.lokasi_id','lokasi.nama_lokasi as lokasi')
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
             ->orderBy('gedung.id', 'asc');
 
