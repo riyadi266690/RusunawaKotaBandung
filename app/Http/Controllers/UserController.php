@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\User\StoreUser;
+use App\Http\Requests\User\UpdateUser;
 use App\Http\Resources\User\UserResource;
 
 class UserController extends Controller
@@ -58,13 +59,11 @@ class UserController extends Controller
         }
     }
 
-    function update(Request $request, $id)
+    function update(UpdateUser $request, $id)
     {
         try {
             $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-                'password' => 'nullable|string|min:6|confirmed',
+              
             ]);
 
             $user = User::find($id);

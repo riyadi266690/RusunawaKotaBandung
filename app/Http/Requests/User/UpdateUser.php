@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Unit;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateUnit extends FormRequest
+class UpdateUser extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,9 +22,9 @@ class UpdateUnit extends FormRequest
     public function rules(): array
     {
         return [
-            'lantai' => 'required|integer|min:1|max:5',
-            'tipe_unit' => 'required|string|in:Hunian,RBH',
-            'status_jual' => 'required|string|in:0,1',
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,',
+                'password' => 'nullable|string|min:6|confirmed',
         ];
     }
 }

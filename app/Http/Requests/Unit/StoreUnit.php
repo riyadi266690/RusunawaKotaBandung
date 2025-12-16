@@ -11,7 +11,7 @@ class StoreUnit extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,9 @@ class StoreUnit extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'lantai' => 'required|integer|min:1|max:5',
+            'tipe_unit' => 'required|string|in:Hunian,RBH',
+            'status_jual' => 'required|string|in:0,1',
         ];
     }
 }

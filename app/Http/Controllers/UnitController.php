@@ -83,44 +83,6 @@ class UnitController extends Controller
      */
     public function storeUnit(StoreUnit $request)
     {
-        $validator = Validator::make($request->validate(), [
-            'gedung_id' => 'required|exists:gedung,id',
-            'nomor' => [
-                'required',
-                'string',
-                'max:255',
-                // Aturan unik kompleks: nomor harus unik untuk kombinasi gedung_id, lantai, dan tipe_unit
-                \Illuminate\Validation\Rule::unique('unit')->where(function ($query) use ($request) {
-                    return $query->where('gedung_id', $request->gedung_id)
-                        ->where('lantai', $request->lantai)
-                        ->where('tipe_unit', $request->tipe_unit);
-                })
-            ],
-            'lantai' => 'required|integer|min:1|max:5',
-            'tipe_unit' => 'required|string|in:Hunian,RBH',
-            'status_jual' => 'required|string|in:0,1',
-        ], [
-            'gedung_id.required' => 'Gedung harus dipilih.',
-            'gedung_id.exists' => 'Gedung tidak valid.',
-            'nomor.required' => 'Nomor unit harus diisi.',
-            'nomor.unique' => 'Nomor unit sudah ada untuk gedung, lantai, dan tipe unit ini.', // Pesan error diperbarui
-            'lantai.required' => 'Lantai harus diisi.',
-            'lantai.integer' => 'Lantai harus berupa angka.',
-            'lantai.min' => 'Lantai minimal 1.',
-            'lantai.max' => 'Lantai maksimal 5.',
-            'tipe_unit.required' => 'Tipe unit harus dipilih.',
-            'tipe_unit.in' => 'Tipe unit tidak valid.',
-            'status_jual.required' => 'Status jual harus dipilih.',
-            'status_jual.in' => 'Status jual tidak valid.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         try {
             DB::beginTransaction();
             Unit::create($request->validate());
@@ -171,9 +133,7 @@ class UnitController extends Controller
                         ->where('tipe_unit', $request->tipe_unit);
                 })->ignore($unit->id)
             ],
-            'lantai' => 'required|integer|min:1|max:5',
-            'tipe_unit' => 'required|string|in:Hunian,RBH',
-            'status_jual' => 'required|string|in:0,1',
+           
         ], [
             'gedung_id.required' => 'Gedung harus dipilih.',
             'gedung_id.exists' => 'Gedung tidak valid.',
