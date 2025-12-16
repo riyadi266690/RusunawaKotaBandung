@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Penghuni\StoreRequestPenghuni;
+use App\Http\Requests\Penghuni\UpdateRequestPenghuni;
 use App\Models\Penghuni;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -34,28 +36,10 @@ class PenghuniController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreRequestPenghuni $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nik'           => 'required|unique:penghuni,nik',
-            'email'         => 'required|email|unique:penghuni,email',
-            'no_tlp'        => 'required|unique:penghuni,no_tlp',
-            'nama'          => 'required|string',
-            'tgl_lahir'     => 'required|date',
-            'tempat_lahir'  => 'required',
-            'jenis_kelamin' => 'required|in:1,2',
-            'status_kawin'  => 'required',
-            'agama'         => 'required',
-            'pekerjaan'     => 'required',
-            'alamat'        => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
         try {
-            Penghuni::create($request->all());
+            Penghuni::create($request->validated());
 
             return response()->json(['success' => true, 'message' => 'Data penghuni berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -63,24 +47,13 @@ class PenghuniController extends Controller
         }
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateRequestPenghuni $request, $id)
     {
         $penghuni = Penghuni::find($id);
         if (!$penghuni) return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
 
-        $validator = Validator::make($request->all(), [
-            'nik'           => 'required|unique:penghuni,nik,' . $id, // Ignore ID sendiri
-            'email'         => 'required|email|unique:penghuni,email,' . $id,
-            'no_tlp'        => 'required|unique:penghuni,no_tlp,' . $id,
-            'nama'          => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
         try {
-            $penghuni->update($request->all());
+            $penghuni->update($request->validated());
             return response()->json(['success' => true, 'message' => 'Data berhasil diperbarui.']);
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
