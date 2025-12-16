@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
-=======
 use App\Http\Requests\DataLokasi\StoreData;
 use App\Http\Requests\DataLokasi\UpdateData;
-use App\Models\Gedung;
->>>>>>> 71f7c2cceaea65b76b7037bf5fa8d68e7ad317d3
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

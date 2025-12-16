@@ -11,7 +11,7 @@ class StoreKontrak extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -28,7 +28,8 @@ class StoreKontrak extends FormRequest
             'tgl_awal' => 'required|date',
             'tgl_akhir' => 'required|date|after_or_equal:tgl_awal',
             'nama_pihak1' => 'required|string',
-            'penghuni_id' => 'required|exists:penghuni,id',
+            'penghuni' => 'required|exists:penghuni,id',
+            'unit_id' => 'required|exists:unit,id',
         ];
     }
 }

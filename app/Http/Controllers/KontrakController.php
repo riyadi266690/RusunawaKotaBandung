@@ -44,28 +44,6 @@ class KontrakController extends Controller
         return response()->json(['message' => 'Data ditemukan', 'data' => $kontrak]);
     }
 
-    public function store(StoreKontrak $request)
-    {
-        try {
-            DB::beginTransaction();
-
-            $data = $request->validate();
-            $data['status_kontrak'] = 1;
-
-            $kontrak = Kontrak::create($data);
-            $kontrakId = $kontrak->id;
-
-            $this->generateDocument($kontrak, $data['tipe_kontrak']);
-
-            DB::commit();
-            return response()->json(['success' => true, 'message' => 'Kontrak berhasil dibuat.']);
-        } catch (\Exception $e) {
-            DB::rollback();
-            Log::error($e->getMessage());
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
-        }
-    }
-
     private function generateDocument($kontrak, $tipe)
     {
         $filepath = storage_path('app/public/kontrak/' . $kontrak->id . '/');
@@ -107,6 +85,30 @@ class KontrakController extends Controller
             }
         }
     }
+
+    public function store(StoreKontrak $request)
+    {
+        try {
+            DB::beginTransaction();
+
+            $data = $request->validated();
+            $data['status_kontrak'] = 1;
+
+            $kontrak = Kontrak::create($data);
+            $kontrakId = $kontrak->id;
+
+            $this->generateDocument($kontrak, $data['tipe_kontrak']);
+
+            DB::commit();
+            return response()->json(['success' => true, 'message' => 'Kontrak berhasil dibuat.']);
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    
 
     public function getPenghuniOptions(Request $request)
     {

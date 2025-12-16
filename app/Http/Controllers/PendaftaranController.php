@@ -165,7 +165,7 @@ class PendaftaranController extends Controller
         }
     }
 
-    public function updateTanggalSelesai(Request $request, $id)
+    public function updateTanggalSelesai(UpdatePendaftar $request, $id)
     {
         $pendaftar = Pendaftaran::findOrFail($id);
         $tglWawancara = $pendaftar->tgl_wawancara;

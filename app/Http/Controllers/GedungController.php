@@ -75,7 +75,7 @@ class GedungController extends Controller
     {
         try {
             DB::beginTransaction();
-            Gedung::create($request->validate());
+            Gedung::create($request->validated());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data gedung berhasil ditambahkan.']);
         } catch (\Exception $e) {
