@@ -85,26 +85,6 @@ class PendaftaranController extends Controller
      */
     public function store(StorePendaftar $request)
     {
-        // Validasi data awal tanpa memeriksa unik
-        $validator = Validator::make($request->validate(), [
-            'nama' => 'required|string|max:255',
-            'telp_pendaftar' => 'required|numeric',
-            'suket' => 'required|file|mimes:pdf|max:2048',
-        ], [
-            'nama.required' => 'Nama lengkap harus diisi.',
-            'telp_pendaftar.required' => 'No Telp / WhatsApp harus diisi.',
-            'telp_pendaftar.numeric' => 'No Telp / WhatsApp harus berupa angka.',
-            'suket.required' => 'Unggah Formulir Pendaftaran harus diisi.',
-            'suket.mimes' => 'File harus berupa PDF.',
-            'suket.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
-        ]);
-
-        if ($validator->fails()) {
-            return $request->expectsJson()
-                ? response()->json(['errors' => $validator->errors()], 422)
-                : back()->withErrors($validator)->withInput();
-        }
-
         try {
             DB::beginTransaction();
 
@@ -152,24 +132,6 @@ class PendaftaranController extends Controller
      */
     public function updateTanggalWawancara(UpdatePendaftar $request, $id)
     {
-        $validator = Validator::make($request->validate(), [
-            'tgl_wawancara' => 'required|date',
-            'tgl_final' => 'nullable|date',
-            'ket_wawancara' => 'nullable|string',
-        ], [
-            'tgl_wawancara.required' => 'Tanggal wawancara harus diisi.',
-            'tgl_wawancara.date' => 'Format tanggal tidak valid.',
-            'tgl_final.nullable' => 'Tanggal selesai harus diisi.',
-            'tgl_final.date' => 'Format selesai tidak valid.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         try {
             DB::beginTransaction();
 

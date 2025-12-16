@@ -22,7 +22,9 @@ class UpdatePendaftar extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'tgl_wawancara' => 'required|date',
+            'tgl_final' => 'nullable|date',
+            'ket_wawancara' => 'nullable|string',
         ];
     }
 }

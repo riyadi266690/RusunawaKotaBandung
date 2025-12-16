@@ -22,7 +22,9 @@ class StorePendaftar extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nama' => 'required|string|max:255',
+            'telp_pendaftar' => 'required|numeric',
+            'suket' => 'required|file|mimes:pdf|max:2048',
         ];
     }
 }
