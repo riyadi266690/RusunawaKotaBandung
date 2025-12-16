@@ -2,6 +2,12 @@
 
 namespace App\Http\Controllers;
 
+<<<<<<< HEAD
+=======
+use App\Http\Requests\DataLokasi\StoreData;
+use App\Http\Requests\DataLokasi\UpdateData;
+use App\Models\Gedung;
+>>>>>>> 71f7c2cceaea65b76b7037bf5fa8d68e7ad317d3
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -65,26 +71,8 @@ class DataLokasiController extends Controller
         ]);
     }
 
-    public function storeLokasi(Request $request)
+    public function storeLokasi(StoreData $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi',
-            'kepala_lokasi' => 'required|string|max:255',
-            'alamat_lokasi' => 'required|string|max:255',
-        ], [
-            'nama_lokasi.required' => 'Nama lokasi harus diisi.',
-            'nama_lokasi.unique' => 'Nama lokasi sudah ada.',
-            'kepala_lokasi.required' => 'Penanggung jawab harus diisi.',
-            'alamat_lokasi.required' => 'Alamat harus diisi.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         try {
             DB::beginTransaction();
             $userId = Auth::id();
@@ -103,26 +91,10 @@ class DataLokasiController extends Controller
         }
     }
 
-    public function updateLokasi(Request $request, Lokasi $lokasi)
+    public function updateLokasi(UpdateData $request, Lokasi $lokasi)
     {
         $user = Auth::user();
-        $validator = Validator::make($request->all(), [
-            'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,' . $lokasi->id,
-            'kepala_lokasi' => 'required|string|max:255',
-            'alamat_lokasi' => 'required|string|max:255',
-        ], [
-            'nama_lokasi.required' => 'Nama lokasi harus diisi.',
-            'nama_lokasi.unique' => 'Nama lokasi sudah ada.',
-            'kepala_lokasi.required' => 'Penanggung jawab harus diisi.',
-            'alamat_lokasi.required' => 'Alamat harus diisi.',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
 
         if ($user->role_id !== 1 && $lokasi->id_user !== $user->id) {
             return response()->json([

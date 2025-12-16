@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Kontrak\StoreKontrak;
+use App\Http\Requests\Kontrak\UpdateKontrak;
 use App\Models\Kontrak;
 use App\Models\Penghuni;
 use App\Models\Unit;
@@ -177,7 +178,7 @@ class KontrakController extends Controller
         ]]);
     }
 
-    public function putusKontrak(Request $request, Kontrak $kontrak)
+    public function putusKontrak(UpdateKontrak $request, Kontrak $kontrak)
     {
         $request->validate(['tgl_keluar' => 'required|date']);
         $kontrak->update(['status_kontrak' => 0, 'tgl_keluar' => $request->tgl_keluar]);
