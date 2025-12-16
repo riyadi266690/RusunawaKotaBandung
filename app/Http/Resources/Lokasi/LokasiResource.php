@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Lokasi;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class PenghuniResource extends JsonResource
+class LokasiResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,6 +14,10 @@ class PenghuniResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id_lokasi' => $this->id,
+            'nama_lokasi' => $this->nama_lokasi,
+            'alamat_lokasi' => $this->alamat_lokasi,
+        ];
     }
 }

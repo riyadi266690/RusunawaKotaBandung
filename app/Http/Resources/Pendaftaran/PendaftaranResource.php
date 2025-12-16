@@ -14,6 +14,16 @@ class PendaftaranResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id_pendaftaran' => $this->id,
+            'nama_pendaftar' => $this->nama,
+            'nomor_pendaftar' => $this->telp_pendaftar,
+            'surat_keterangan' => $this->suket,
+            'status_pendaftaran' => $this->status_daftar,
+            'tanggal_daftar' => $this->tgl_daftar,
+            'tanggal_wawancara' => $this->tgl_wawancara,
+            'tanggal_selesai' => $this->tgl_final,
+            'keterangan_wawancara' => $this->ket_wawancara
+        ];
     }
 }

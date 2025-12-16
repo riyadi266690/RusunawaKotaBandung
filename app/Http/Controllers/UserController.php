@@ -15,7 +15,7 @@ class UserController extends Controller
     function index()
     {
         try {
-            $user = User::all();
+            $user = User::with('role')->get();
 
             return response()->json([
                 'success' => true,

@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KontrakController;
 use App\Http\Controllers\PendaftaranController;
-use App\Http\Controllers\PengaturanController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DataLokasiController;
 use App\Http\Controllers\GedungController;

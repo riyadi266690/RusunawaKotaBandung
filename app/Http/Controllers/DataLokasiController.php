@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-<<<<<<< HEAD
-=======
 use App\Http\Requests\DataLokasi\StoreData;
 use App\Http\Requests\DataLokasi\UpdateData;
-use App\Models\Gedung;
->>>>>>> 71f7c2cceaea65b76b7037bf5fa8d68e7ad317d3
+use App\Http\Resources\Lokasi\LokasiResource;
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -21,34 +18,37 @@ class DataLokasiController extends Controller
     //
     public function allDataLokasi()
     {
-        $user = Auth::user();
+        try {
+            $user = Auth::user();
 
-        if ($user->role_id == 1) {
-            $lokasi = Lokasi::all();
+            if ($user->role_id == 1) {
+                $lokasi = Lokasi::all();
+
+                return response()->json([
+                    'success' => true,
+                    'data' => LokasiResource::collection($lokasi)
+                ]);
+            }
+
+            $lokasi = Lokasi::where('id_user', $user->id)->get();
+
+            if ($lokasi->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Belum ada data lokasi.',
+                    'data' => []
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
-                'data' => $lokasi
+                'data' => LokasiResource::collection($lokasi)
             ]);
+        } catch (\Exception $e) {
+            Log::error('Error fetching all data lokasi: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return response()->json(['success' => false, 'message' => 'Gagal memuat data lokasi: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        $lokasi = Lokasi::where('id_user', $user->id)->get();
-
-        if ($lokasi->isEmpty()) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Belum ada data lokasi.',
-                'data' => []
-            ]);
-        }
-
-        return response()->json([
-            'success' => true,
-            'data' => $lokasi
-        ]);
     }
-
-
 
     public function ajax_DTLokasi(Request $request)
     {
@@ -162,5 +162,4 @@ class DataLokasiController extends Controller
             return response()->json(['success' => false, 'message' => 'Gagal memuat opsi lokasi: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 }

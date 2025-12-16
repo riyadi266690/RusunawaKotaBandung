@@ -49,7 +49,7 @@ class KontrakController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->validate();
+            $data = $request->validated();
             $data['status_kontrak'] = 1;
 
             $kontrak = Kontrak::create($data);

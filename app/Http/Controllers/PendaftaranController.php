@@ -24,7 +24,8 @@ class PendaftaranController extends Controller
             $pendaftar = Pendaftaran::all();
 
             return response()->json([
-                'gagal' => 'Data kosong',
+                'success' => true,
+                'data' => PendaftaranResource::collection($pendaftar)
             ]);
         } catch (\Exception $e) {
             Log::error($e->getMessage());
@@ -176,7 +177,7 @@ class PendaftaranController extends Controller
         ], [
             'tgl_final.required' => 'Tanggal selesai harus diisi.',
             'tgl_final.date' => 'Format tanggal tidak valid.',
-            'tgl_final.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal wawancara.', // Pesan BARU
+            'tgl_final.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal wawancara.',
             'ket_wawancara.string' => 'Catatan wawancara harus berupa teks.',
         ]);
 
@@ -192,7 +193,7 @@ class PendaftaranController extends Controller
 
             $pendaftar = Pendaftaran::findOrFail($id);
             $pendaftar->tgl_final = $request->tgl_final;
-            $pendaftar->ket_wawancara = $request->ket_wawancara; // Simpan catatan
+            $pendaftar->ket_wawancara = $request->ket_wawancara;
             $pendaftar->status_daftar = 3;
             $pendaftar->save();
 
