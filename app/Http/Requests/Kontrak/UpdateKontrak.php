@@ -22,7 +22,7 @@ class UpdateKontrak extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'tgl_keluar' => 'required|date',
         ];
     }
 }

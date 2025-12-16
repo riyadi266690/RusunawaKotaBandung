@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Pendaftar\StorePendaftar;
 use App\Http\Requests\Pendaftar\UpdatePendaftar;
-use App\Models\Pendaftaran;
->>>>>>> 71f7c2cceaea65b76b7037bf5fa8d68e7ad317d3
 use Exception;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;

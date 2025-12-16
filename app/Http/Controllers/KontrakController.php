@@ -46,29 +46,6 @@ class KontrakController extends Controller
 
     public function store(StoreKontrak $request)
     {
-        $validator = Validator::make($request->validate(), [
-            'unit_id' => [
-                'required',
-                'exists:unit,id',
-                function ($attribute, $value, $fail) {
-                    if (Kontrak::where('unit_id', $value)->where('status_kontrak', 1)->exists()) {
-                        $fail('Unit ini sedang dikontrak aktif.');
-                    }
-                }
-            ],
-            'no_kontrak' => 'required|unique:kontrak,no_kontrak',
-            'tipe_kontrak' => 'required|in:1,2',
-            'harga_sewa' => 'required|integer',
-            'tgl_awal' => 'required|date',
-            'tgl_akhir' => 'required|date|after_or_equal:tgl_awal',
-            'nama_pihak1' => 'required|string',
-            'penghuni_id' => 'required|exists:penghuni,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
-        }
-
         try {
             DB::beginTransaction();
 
@@ -180,7 +157,6 @@ class KontrakController extends Controller
 
     public function putusKontrak(UpdateKontrak $request, Kontrak $kontrak)
     {
-        $request->validate(['tgl_keluar' => 'required|date']);
         $kontrak->update(['status_kontrak' => 0, 'tgl_keluar' => $request->tgl_keluar]);
         return response()->json(['success' => true]);
     }

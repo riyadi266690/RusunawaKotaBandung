@@ -22,7 +22,13 @@ class StoreKontrak extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'no_kontrak' => 'required|unique:kontrak,no_kontrak',
+            'tipe_kontrak' => 'required|in:1,2',
+            'harga_sewa' => 'required|integer',
+            'tgl_awal' => 'required|date',
+            'tgl_akhir' => 'required|date|after_or_equal:tgl_awal',
+            'nama_pihak1' => 'required|string',
+            'penghuni_id' => 'required|exists:penghuni,id',
         ];
     }
 }
