@@ -95,23 +95,7 @@ class GedungController extends Controller
     public function updateGedung(UpdateGedung $request, Gedung $gedung)
     {
         $user = Auth::user();
-        $validator = Validator::make($request->validate(), [
-           
-        ], [
-            'nama_gedung.required' => 'Nama gedung harus diisi.',
-            'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.',
-            'tipe_gedung.required' => 'Tipe gedung harus diisi.',
-            'lokasi_id.required' => 'Lokasi harus dipilih.',
-            'lokasi_id.exists' => 'Lokasi tidak valid.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
+        
         if ($user->role_id !== 1 && $user->id !== $gedung->Lokasi->id_user) {
             return response()->json([
                 'success' => false,
