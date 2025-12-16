@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Unit\StoreUnit;
+use App\Http\Requests\Unit\UpdateUnit;
 use App\Models\Gedung;
 use App\Models\Lokasi;
 use App\Models\Unit;
@@ -79,9 +81,9 @@ class UnitController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function storeUnit(Request $request)
+    public function storeUnit(StoreUnit $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->validate(), [
             'gedung_id' => 'required|exists:gedung,id',
             'nomor' => [
                 'required',
@@ -121,7 +123,7 @@ class UnitController extends Controller
 
         try {
             DB::beginTransaction();
-            Unit::create($request->all());
+            Unit::create($request->validate());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data unit berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -154,9 +156,9 @@ class UnitController extends Controller
      * @param  \App\Models\Unit  $unit
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateUnit(Request $request, Unit $unit)
+    public function updateUnit(UpdateUnit $request, Unit $unit)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->validate(), [
             'gedung_id' => 'required|exists:gedung,id',
             'nomor' => [
                 'required',
@@ -196,7 +198,7 @@ class UnitController extends Controller
 
         try {
             DB::beginTransaction();
-            $unit->update($request->all());
+            $unit->update($request->validate());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data unit berhasil diperbarui.']);
         } catch (\Exception $e) {

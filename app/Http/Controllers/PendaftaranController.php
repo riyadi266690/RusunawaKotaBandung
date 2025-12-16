@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Pendaftar\StorePendaftar;
+use App\Http\Requests\Pendaftar\UpdatePendaftar;
 use App\Models\Pendaftaran;
 use Exception;
 use Illuminate\Http\Request;
@@ -80,10 +82,10 @@ class PendaftaranController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StorePendaftar $request)
     {
         // Validasi data awal tanpa memeriksa unik
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->validate(), [
             'nama' => 'required|string|max:255',
             'telp_pendaftar' => 'required|numeric',
             'suket' => 'required|file|mimes:pdf|max:2048',
@@ -155,9 +157,9 @@ class PendaftaranController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateTanggalWawancara(Request $request, $id)
+    public function updateTanggalWawancara(UpdatePendaftar $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->validate(), [
             'tgl_wawancara' => 'required|date',
             'tgl_final' => 'nullable|date',
             'ket_wawancara' => 'nullable|string',

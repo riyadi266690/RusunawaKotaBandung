@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Gedung\StoreGedung;
+use App\Http\Requests\Gedung\UpdateGedung;
 use App\Models\Gedung;
 use App\Models\Lokasi;
 use App\Models\Unit;
@@ -69,30 +71,11 @@ class GedungController extends Controller
         ]);
     }
 
-    public function storeGedung(Request $request)
+    public function storeGedung(StoreGedung $request)
     {
-        $validator = Validator::make($request->all(), [
-            'nama_gedung' => 'required|string|max:255|unique:gedung,nama_gedung,NULL,id,lokasi_id,' . $request->lokasi_id,
-            'tipe_gedung' => 'required|string|max:255',
-            'lokasi_id' => 'required|exists:lokasi,id',
-        ], [
-            'nama_gedung.required' => 'Nama gedung harus diisi.',
-            'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.',
-            'tipe_gedung.required' => 'Tipe gedung harus diisi.',
-            'lokasi_id.required' => 'Lokasi harus dipilih.',
-            'lokasi_id.exists' => 'Lokasi tidak valid.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         try {
             DB::beginTransaction();
-            Gedung::create($request->all());
+            Gedung::create($request->validate());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data gedung berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -109,13 +92,11 @@ class GedungController extends Controller
      * @param  \App\Models\Gedung  $gedung
      * @return \Illuminate\Http\JsonResponse
      */
-    public function updateGedung(Request $request, Gedung $gedung)
+    public function updateGedung(UpdateGedung $request, Gedung $gedung)
     {
         $user = Auth::user();
-        $validator = Validator::make($request->all(), [
-            'nama_gedung' => 'required|string|max:255|unique:gedung,nama_gedung,' . $gedung->id . ',id,lokasi_id,' . $request->lokasi_id,
-            'tipe_gedung' => 'required|string|max:255',
-            'lokasi_id' => 'required|exists:lokasi,id',
+        $validator = Validator::make($request->validate(), [
+           
         ], [
             'nama_gedung.required' => 'Nama gedung harus diisi.',
             'nama_gedung.unique' => 'Nama gedung sudah ada untuk lokasi ini.',
@@ -140,7 +121,7 @@ class GedungController extends Controller
 
         try {
             DB::beginTransaction();
-            $gedung->update($request->all());
+            $gedung->update($request->validate());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data gedung berhasil diperbarui.']);
         } catch (\Exception $e) {
