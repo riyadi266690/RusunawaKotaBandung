@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Pendaftaran;
 use Exception;
+use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
-use Yajra\DataTables\Facades\DataTables;
+use App\Http\Resources\Pendaftaran\PendaftaranResource;
 
 class PendaftaranController extends Controller
 {
@@ -18,63 +18,64 @@ class PendaftaranController extends Controller
      */
     public function index()
     {
-        $pendaftar = Pendaftaran::all();
+        try {
+            $pendaftar = Pendaftaran::all();
 
-        if ($pendaftar->isEmpty()) {
             return response()->json([
                 'gagal' => 'Data kosong',
             ]);
-        }
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
 
-        return response()->json([
-            'sukses' => 'Data ditemukan',
-            'data' => $pendaftar
-        ]);
+            return response()->json([
+                'sukses' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
-    public function index_pengelola()
-    {
-        return view('pendaftaran.index_pengelola');
-    }
+
     public function ajax_DTpendaftar(Request $request)
     {
-        $query = Pendaftaran::query()
-            ->select(
-                'nama',
-                'id',
-                'telp_pendaftar',
-                'suket',
-                'status_daftar',
-                'tgl_daftar',
-                'tgl_wawancara',
-                'tgl_final',
-                'ket_wawancara',
-                'suket',
-                'updated_by'
-            )
-            ->orderBy('id', 'desc');
+        try {
+            $query = Pendaftaran::query()
+                ->select(
+                    'nama',
+                    'id',
+                    'telp_pendaftar',
+                    'suket',
+                    'status_daftar',
+                    'tgl_daftar',
+                    'tgl_wawancara',
+                    'tgl_final',
+                    'ket_wawancara',
+                    'suket',
+                    'updated_by'
+                )
+                ->orderBy('id', 'desc');
 
-        $pendaftars = $query->get();
+            $pendaftars = $query->get();
 
-        $encryptedTexts = $pendaftars->pluck('nama')->merge($pendaftars->pluck('telp_pendaftar'))->toArray();
-        $decryptedTextsMap = unsealNames($encryptedTexts);
+            $encryptedTexts = $pendaftars->pluck('nama')->merge($pendaftars->pluck('telp_pendaftar'))->toArray();
+            $decryptedTextsMap = unsealNames($encryptedTexts);
 
-        $pendaftars->transform(function ($item) use ($decryptedTextsMap) {
-            $item->nama = $decryptedTextsMap[$item->nama] ?? 'Invalid response';
-            $item->telp_pendaftar = $decryptedTextsMap[$item->telp_pendaftar] ?? 'Invalid response';
-            return $item;
-        });
+            $pendaftars->transform(function ($item) use ($decryptedTextsMap) {
+                $item->nama = $decryptedTextsMap[$item->nama] ?? 'Invalid response';
+                $item->telp_pendaftar = $decryptedTextsMap[$item->telp_pendaftar] ?? 'Invalid response';
+                return $item;
+            });
 
-        return response()->json([
-            'sukses' => true,
-            'data' => $pendaftars
-        ]);
-    }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+            return response()->json([
+                'sukses' => true,
+                'data' => PendaftaranResource::collection($pendaftars)
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'sukses' => false,
+                'message' => $e->getMessage()
+            ]);
+        }
     }
 
     /**

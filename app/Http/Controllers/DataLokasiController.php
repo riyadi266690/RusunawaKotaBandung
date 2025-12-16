@@ -2,15 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Gedung;
 use App\Models\Lokasi;
-use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Auth;
 
 class DataLokasiController extends Controller
