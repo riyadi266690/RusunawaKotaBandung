@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Kontrak\StoreKontrak;
 use App\Models\Kontrak;
 use App\Models\Penghuni;
 use App\Models\Unit;
@@ -42,9 +43,9 @@ class KontrakController extends Controller
         return response()->json(['message' => 'Data ditemukan', 'data' => $kontrak]);
     }
 
-    public function store(Request $request)
+    public function store(StoreKontrak $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->validate(), [
             'unit_id' => [
                 'required',
                 'exists:unit,id',
@@ -70,7 +71,7 @@ class KontrakController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->all();
+            $data = $request->validate();
             $data['status_kontrak'] = 1;
 
             $kontrak = Kontrak::create($data);
