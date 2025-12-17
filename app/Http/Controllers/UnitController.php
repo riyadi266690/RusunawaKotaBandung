@@ -83,7 +83,7 @@ class UnitController extends Controller
      */
     public function storeUnit(StoreUnit $request)
     {
-        $validator = Validator::make($request->validate(), [
+        $validator = Validator::make($request->validated(), [
             'gedung_id' => 'required|exists:gedung,id',
             'nomor' => [
                 'required',
@@ -123,7 +123,7 @@ class UnitController extends Controller
 
         try {
             DB::beginTransaction();
-            Unit::create($request->validate());
+            Unit::create($request->validated());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data unit berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -158,7 +158,7 @@ class UnitController extends Controller
      */
     public function updateUnit(UpdateUnit $request, Unit $unit)
     {
-        $validator = Validator::make($request->validate(), [
+        $validator = Validator::make($request->validated(), [
             'gedung_id' => 'required|exists:gedung,id',
             'nomor' => [
                 'required',
@@ -198,7 +198,7 @@ class UnitController extends Controller
 
         try {
             DB::beginTransaction();
-            $unit->update($request->validate());
+            $unit->update($request->validated());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data unit berhasil diperbarui.']);
         } catch (\Exception $e) {

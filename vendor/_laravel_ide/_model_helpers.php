@@ -5,21 +5,9 @@ namespace App\Models {
     /**
      * App\Models\Gedung
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $lokasi_id
-     * @property string $tipe_gedung
-     * @property string $nama_gedung
-     * @property int $id
      * @property-read \App\Models\Lokasi $Lokasi
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Unit> $Unit
      * @property-read int|null $Unit_count
-     * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung whereNamaGedung($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung whereTipeGedung($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung whereLokasiId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Gedung>|Gedung query()
@@ -315,63 +303,11 @@ namespace App\Models {
     /**
      * App\Models\Kontrak
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $deleted_at
-     * @property int|null $deleted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property int $penghuni_id4
-     * @property int $penghuni_id3
-     * @property int $penghuni_id2
-     * @property int $penghuni_id1
-     * @property string|null $dok_kontrak
-     * @property float|null $luas_usaha
-     * @property string|null $jenis_usaha
-     * @property int|null $harga_air
-     * @property int|null $harga_sewa
-     * @property int $status_ttd
-     * @property string $nama_pihak1
-     * @property int $status_kontrak
-     * @property int|null $masa_kontrak
-     * @property string|null $tgl_keluar
-     * @property string $tgl_akhir
-     * @property string $tgl_awal
-     * @property int $tipe_kontrak
-     * @property string $no_kontrak
-     * @property int $unit_id
-     * @property int $id
      * @property-read \App\Models\Unit $unit
      * @property-read \App\Models\Penghuni $penghuni
      * @property-read \App\Models\User $creator
      * @property-read \App\Models\User $updater
      * @property-read \App\Models\User $deleter
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereUnitId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereNoKontrak($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereTipeKontrak($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereTglAwal($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereTglAkhir($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereTglKeluar($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereMasaKontrak($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereStatusKontrak($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereNamaPihak1($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereStatusTtd($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereHargaSewa($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereHargaAir($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereJenisUsaha($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereLuasUsaha($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereDokKontrak($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak wherePenghuniId1($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak wherePenghuniId2($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak wherePenghuniId3($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak wherePenghuniId4($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereDeletedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereDeletedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Kontrak>|Kontrak query()
@@ -667,24 +603,10 @@ namespace App\Models {
     /**
      * App\Models\Lokasi
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $id_user
-     * @property string $alamat_lokasi
-     * @property string $kepala_lokasi
-     * @property string $nama_lokasi
-     * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Gedung> $Gedung
      * @property-read int|null $Gedung_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $User
      * @property-read int|null $User_count
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereNamaLokasi($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereKepalaLokasi($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereAlamatLokasi($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereIdUser($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Lokasi>|Lokasi query()
@@ -980,34 +902,8 @@ namespace App\Models {
     /**
      * App\Models\Pendaftaran
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
-     * @property string|null $ket_wawancara
-     * @property string|null $tgl_final
-     * @property string|null $tgl_wawancara
-     * @property string $tgl_daftar
-     * @property int $status_daftar
-     * @property string $suket
-     * @property string|null $telp_pendaftar_hash
-     * @property string $telp_pendaftar
-     * @property string $nama
-     * @property int $id
      * @property-read \App\Models\User $Updater
      * @property-read \App\Models\User $deleter
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereNama($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereTelpPendaftar($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereTelpPendaftarHash($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereSuket($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereStatusDaftar($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereTglDaftar($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereTglWawancara($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereTglFinal($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereKetWawancara($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Pendaftaran>|Pendaftaran query()
@@ -1303,28 +1199,6 @@ namespace App\Models {
     /**
      * App\Models\Penghuni
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $deleted_at
-     * @property int|null $deleted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property string|null $alamat
-     * @property string|null $pekerjaan
-     * @property int $agama
-     * @property int $status_kawin
-     * @property int $jenis_kelamin
-     * @property string|null $no_tlp_hmac
-     * @property string $no_tlp
-     * @property string|null $tempat_lahir
-     * @property string $tgl_lahir
-     * @property string|null $email_hmac
-     * @property string $email
-     * @property string|null $nama_hmac
-     * @property string $nama
-     * @property string|null $nik_hmac
-     * @property string $nik
-     * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kontrak> $kontrakAsPenghuni1
      * @property-read int|null $kontrakAsPenghuni1_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kontrak> $kontrakAsPenghuni2
@@ -1336,28 +1210,6 @@ namespace App\Models {
      * @property-read \App\Models\User $createdBy
      * @property-read \App\Models\User $updatedBy
      * @property-read \App\Models\User $deletedBy
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNik($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNikHmac($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNama($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNamaHmac($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereEmail($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereEmailHmac($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereTglLahir($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereTempatLahir($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNoTlp($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNoTlpHmac($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereJenisKelamin($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereStatusKawin($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereAgama($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni wherePekerjaan($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereAlamat($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereDeletedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereDeletedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni query()
@@ -1653,24 +1505,8 @@ namespace App\Models {
     /**
      * App\Models\Role
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $deleted_at
-     * @property int|null $deleted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property string $nama_role
-     * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $User
      * @property-read int|null $User_count
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereNamaRole($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereCreatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereUpdatedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereDeletedBy($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereDeletedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Role>|Role query()
@@ -1966,25 +1802,9 @@ namespace App\Models {
     /**
      * App\Models\Unit
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string $status_jual
-     * @property string $tipe_unit
-     * @property string $lantai
-     * @property string $nomor
-     * @property int $gedung_id
-     * @property int $id
      * @property-read \App\Models\Gedung $Gedung
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kontrak> $kontrak
      * @property-read int|null $kontrak_count
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereGedungId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereNomor($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereLantai($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereTipeUnit($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereStatusJual($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Unit>|Unit query()
@@ -2280,30 +2100,12 @@ namespace App\Models {
     /**
      * App\Models\User
      *
-     * @property \Illuminate\Support\Carbon|null $updated_at
-     * @property \Illuminate\Support\Carbon|null $created_at
-     * @property string|null $remember_token
-     * @property int $role_id
-     * @property string $password
-     * @property \Illuminate\Support\Carbon|null $email_verified_at
-     * @property string $email
-     * @property string $name
-     * @property int $id
      * @property-read \App\Models\Role $role
      * @property-read \App\Models\Lokasi $Lokasi
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
      * @property-read int|null $tokens_count
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
      * @property-read int|null $notifications_count
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereName($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereEmail($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereEmailVerifiedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User wherePassword($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereRoleId($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereRememberToken($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereCreatedAt($value)
-     * @method static \Illuminate\Database\Eloquent\Builder<User>|User whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<User>|User newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<User>|User newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<User>|User query()

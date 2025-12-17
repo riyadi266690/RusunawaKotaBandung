@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama');;
             $table->string('telp_pendaftar');
+            $table->string('telp_pendaftar_hash')->nullable();
             $table->string('suket');
             $table->integer('status_daftar');
             $table->date('tgl_daftar');

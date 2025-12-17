@@ -4,8 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KontrakController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DataLokasiController;
 use App\Http\Controllers\GedungController;
+use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PenghuniController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -21,12 +21,13 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::get('/dashboard-data', [DashboardController::class, 'index']);
 
     // Pendaftar
-    Route::get('/dataPendaftar', [PendaftaranController::class, 'index']);
+    Route::get('/dataPendaftar', [PendaftaranController::class, 'allDataPendaftaran']);
     Route::put('/updateTanggalWawancara/{id}', [PendaftaranController::class, 'updateTanggalWawancara']);
     Route::put('/updateTanggalSelesai/{id}', [PendaftaranController::class, 'updateTanggalSelesai']);
     Route::delete('/deletePendaftar/{id}', [PendaftaranController::class, 'destroy']);
 
     // Penghuni
+    Route::get('/dataPenghuniAll', [PenghuniController::class, 'allDataPenghuni']);
     Route::get('/dataPenghuni', [PenghuniController::class, 'ajax_DTPenghuni']);
     Route::post('/storePenghuni', [PenghuniController::class, 'store']);
     Route::put('/updatePenghuni/{id}', [PenghuniController::class, 'update']);
@@ -46,12 +47,12 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::post('/storeKontrak', [KontrakController::class, 'store']);
 
     // Pengaturan Lokasi
-    Route::get('/dataLokasiAll', [DataLokasiController::class, 'allDataLokasi']);
-    Route::post('/storeLokasi', [DataLokasiController::class, 'storeLokasi']);
-    Route::post('/dataLokasi/{request}', [DataLokasiController::class, 'ajax_DTLokasi']);
-    Route::put('/updateLokasi/{lokasi}', [DataLokasiController::class, 'updateLokasi']);
-    Route::delete('/deleteLokasi/{lokasi}', [DataLokasiController::class, 'destroyLokasi']);
-    Route::get('/getDataLokasi', [DataLokasiController::class, 'getLokasiOptions']);
+    Route::get('/dataLokasiAll', [LokasiController::class, 'allDataLokasi']);
+    Route::post('/storeLokasi', [LokasiController::class, 'storeLokasi']);
+    Route::post('/dataLokasi/{request}', [LokasiController::class, 'ajax_DTLokasi']);
+    Route::put('/updateLokasi/{lokasi}', [LokasiController::class, 'updateLokasi']);
+    Route::delete('/deleteLokasi/{lokasi}', [LokasiController::class, 'destroyLokasi']);
+    Route::get('/getDataLokasi', [LokasiController::class, 'getLokasiOptions']);
 
     // Pengaturan Gedung
     Route::get('/dataGedungAll', [GedungController::class, 'allDataGedung']);

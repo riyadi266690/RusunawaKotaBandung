@@ -13,9 +13,8 @@ use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class DataLokasiController extends Controller
+class LokasiController extends Controller
 {
-    //
     public function allDataLokasi()
     {
         try {
@@ -74,15 +73,9 @@ class DataLokasiController extends Controller
     public function storeLokasi(StoreData $request)
     {
         try {
-            DB::beginTransaction();
-            $userId = Auth::id();
-            Lokasi::create([
-                'nama_lokasi' => $request->nama_lokasi,
-                'kepala_lokasi' => $request->kepala_lokasi,
-                'alamat_lokasi' => $request->alamat_lokasi,
-                'id_user' => $userId
-            ]);
-            DB::commit();
+            DB::transaction(function () use ($request) {
+                Lokasi::create(array_merge($request->validated(), ['id_user' => Auth::user()->id]));
+            });
             return response()->json(['success' => true, 'message' => 'Data lokasi berhasil ditambahkan.']);
         } catch (\Exception $e) {
             DB::rollback();
@@ -94,8 +87,6 @@ class DataLokasiController extends Controller
     public function updateLokasi(UpdateData $request, Lokasi $lokasi)
     {
         $user = Auth::user();
-
-
         if ($user->role_id !== 1 && $lokasi->id_user !== $user->id) {
             return response()->json([
                 'success' => false,
@@ -104,13 +95,9 @@ class DataLokasiController extends Controller
         }
 
         try {
-            DB::beginTransaction();
-
-            $lokasi->update([
-                'nama_lokasi' => $request->nama_lokasi,
-                'kepala_lokasi' => $request->kepala_lokasi,
-                'alamat_lokasi' => $request->alamat_lokasi,
-            ]);
+            DB::transaction(function () use ($request, $lokasi) {
+                $lokasi->update($request->validated());
+            });
 
             DB::commit();
 
@@ -119,7 +106,6 @@ class DataLokasiController extends Controller
                 'message' => 'Data lokasi berhasil diperbarui.'
             ]);
         } catch (\Exception $e) {
-            DB::rollback();
             Log::error('Error updating lokasi: ' . $e->getMessage());
 
             return response()->json([

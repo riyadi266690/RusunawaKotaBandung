@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Kontrak\StoreKontrak;
 use App\Http\Requests\Kontrak\UpdateKontrak;
+use App\Http\Resources\Kontrak\KontrakResource;
 use App\Models\Kontrak;
 use App\Models\Penghuni;
 use App\Models\Unit;
@@ -41,7 +42,44 @@ class KontrakController extends Controller
                 ];
             });
 
-        return response()->json(['message' => 'Data ditemukan', 'data' => $kontrak]);
+        return response()->json(
+            [
+                'message' => 'Data ditemukan',
+                'data' => KontrakResource::collection($kontrak)
+            ]
+        );
+    }
+
+    public function kontrakNonAktif()
+    {
+        $kontrak = Kontrak::with(['unit.gedung.lokasi', 'penghuni'])
+            ->where('status_kontrak', 0)
+            ->orderBy('tgl_keluar', 'desc')
+            ->orderBy('updated_at', 'desc')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'no_kontrak' => $item->no_kontrak,
+                    'nama_penghuni' => $item->penghuni->nama ?? 'Penghuni Terhapus',
+                    'lokasi_nama' => $item->unit->gedung->lokasi->nama_lokasi ?? '-',
+                    'gedung_nama' => $item->unit->gedung->nama_gedung ?? '-',
+                    'unit_lantai' => $item->unit->lantai ?? '-',
+                    'unit_nomor' => $item->unit->nomor ?? '-',
+                    'tgl_awal' => $item->tgl_awal,
+                    'tgl_akhir' => $item->tgl_akhir,
+                    'tgl_keluar' => $item->tgl_keluar,
+                    'masa_kontrak' => $item->masa_kontrak,
+                    'dok_kontrak' => $item->dok_kontrak,
+                    'keterangan' => 'Kontrak Berakhir/Diputus'
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data riwayat ditemukan',
+            'data' => KontrakResource::collection($kontrak)
+        ]);
     }
 
     public function store(StoreKontrak $request)
@@ -159,37 +197,5 @@ class KontrakController extends Controller
     {
         $kontrak->update(['status_kontrak' => 0, 'tgl_keluar' => $request->tgl_keluar]);
         return response()->json(['success' => true]);
-    }
-
-    public function kontrakNonAktif()
-    {
-        $kontrak = Kontrak::with(['unit.gedung.lokasi', 'penghuni'])
-            ->where('status_kontrak', 0)
-            ->orderBy('tgl_keluar', 'desc')
-            ->orderBy('updated_at', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'no_kontrak' => $item->no_kontrak,
-                    'nama_penghuni' => $item->penghuni->nama ?? 'Penghuni Terhapus',
-                    'lokasi_nama' => $item->unit->gedung->lokasi->nama_lokasi ?? '-',
-                    'gedung_nama' => $item->unit->gedung->nama_gedung ?? '-',
-                    'unit_lantai' => $item->unit->lantai ?? '-',
-                    'unit_nomor' => $item->unit->nomor ?? '-',
-                    'tgl_awal' => $item->tgl_awal,
-                    'tgl_akhir' => $item->tgl_akhir,
-                    'tgl_keluar' => $item->tgl_keluar,
-                    'masa_kontrak' => $item->masa_kontrak,
-                    'dok_kontrak' => $item->dok_kontrak,
-                    'keterangan' => 'Kontrak Berakhir/Diputus'
-                ];
-            });
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data riwayat ditemukan',
-            'data' => $kontrak
-        ]);
     }
 }

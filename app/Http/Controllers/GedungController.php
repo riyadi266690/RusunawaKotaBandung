@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Gedung\StoreGedung;
 use App\Http\Requests\Gedung\UpdateGedung;
+use App\Http\Resources\Gedung\GedungResource;
 use App\Models\Gedung;
 use App\Models\Lokasi;
 use App\Models\Unit;
@@ -27,7 +28,7 @@ class GedungController extends Controller
             $gedung = Gedung::with('lokasi')->get();
             return response()->json([
                 'sukses' => true,
-                'data' => $gedung
+                'data' => GedungResource::collection($gedung)
             ]);
         }
 
@@ -44,7 +45,7 @@ class GedungController extends Controller
 
         return response()->json([
             'sukses' => true,
-            'data' => $gedung
+            'data' => GedungResource::collection($gedung)
         ]);
     }
 
@@ -75,7 +76,7 @@ class GedungController extends Controller
     {
         try {
             DB::beginTransaction();
-            Gedung::create($request->validate());
+            Gedung::create($request->validated());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data gedung berhasil ditambahkan.']);
         } catch (\Exception $e) {
@@ -85,17 +86,10 @@ class GedungController extends Controller
         }
     }
 
-    /**
-     * Memperbarui data gedung.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Gedung  $gedung
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function updateGedung(UpdateGedung $request, Gedung $gedung)
     {
         $user = Auth::user();
-        
+
         if ($user->role_id !== 1 && $user->id !== $gedung->Lokasi->id_user) {
             return response()->json([
                 'success' => false,
@@ -105,7 +99,7 @@ class GedungController extends Controller
 
         try {
             DB::beginTransaction();
-            $gedung->update($request->validate());
+            $gedung->update($request->validated());
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data gedung berhasil diperbarui.']);
         } catch (\Exception $e) {
@@ -136,31 +130,12 @@ class GedungController extends Controller
         }
     }
 
-    public function countUnit()
-    {
-        $unit = Unit::count();
-        if ($unit->isEmpty()) {
-            return response()->json(
-                ['gagal' => 'data tidak ditemukan']
-            );
-        }
-        return response()->json(
-            ['message' => 'data ditemukan', 'data' => $unit]
-        );
-    }
-
-    /**
-     * Mengambil daftar gedung untuk dropdown.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function getGedungOptions()
     {
         try {
             $gedung = Gedung::select('gedung.id', 'gedung.nama_gedung', 'lokasi.nama_lokasi as lokasi_nama')
                 ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
                 ->get();
-            // Map data untuk format yang lebih mudah di frontend
             $formattedGedung = $gedung->map(function ($item) {
                 return [
                     'id' => $item->id,

@@ -2,15 +2,15 @@
 
 namespace App\Http\Requests\Pendaftar;
 
+use App\Models\Pendaftaran;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdatePendaftar extends FormRequest
+class UpdateTanggalSelesaiPendaftaran extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
+    protected $tglWawancara;
     public function authorize(): bool
     {
+
         return true;
     }
 
@@ -19,11 +19,19 @@ class UpdatePendaftar extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+    protected function prepareForValidation(): void
+    {
+        $pendaftar = Pendaftaran::find($this->route('id'));
+        $this->tglWawancara = $pendaftar?->tgl_wawancara;
+    }
+
     public function rules(): array
     {
         return [
-            'tgl_wawancara' => 'required|date',
-            'tgl_final' => 'nullable|date',
+            'tgl_final' => [
+                'required|date',
+                'after_or_equal:' . $this->tglWawancara
+            ],
             'ket_wawancara' => 'nullable|string',
         ];
     }
@@ -31,9 +39,9 @@ class UpdatePendaftar extends FormRequest
     public function messages(): array
     {
         return [
-            'tgl_wawancara.required' => 'Tanggal wawancara harus diisi.',
-            'tgl_wawancara.date' => 'Format tanggal tidak valid.',
+            'tgl_final.required' => 'Tanggal selesai harus diisi.',
             'tgl_final.date' => 'Format tanggal tidak valid.',
+            'tgl_final.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal wawancara.',
             'ket_wawancara.string' => 'Catatan wawancara harus berupa teks.',
         ];
     }

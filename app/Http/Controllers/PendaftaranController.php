@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Pendaftar\StorePendaftar;
 use App\Http\Requests\Pendaftar\UpdatePendaftar;
+use App\Http\Requests\Pendaftar\UpdateTanggalSelesaiPendaftaran;
 use Exception;
 use App\Models\Pendaftaran;
 use Illuminate\Http\Request;
@@ -15,10 +16,7 @@ use App\Http\Resources\Pendaftaran\PendaftaranResource;
 
 class PendaftaranController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function allDataPendaftaran()
     {
         try {
             $pendaftar = Pendaftaran::all();
@@ -81,9 +79,6 @@ class PendaftaranController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(StorePendaftar $request)
     {
         try {
@@ -128,9 +123,7 @@ class PendaftaranController extends Controller
         }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function updateTanggalWawancara(UpdatePendaftar $request, $id)
     {
         try {
@@ -166,36 +159,17 @@ class PendaftaranController extends Controller
         }
     }
 
-    public function updateTanggalSelesai(Request $request, $id)
+    public function updateTanggalSelesai(UpdateTanggalSelesaiPendaftaran $request, $id)
     {
-        $pendaftar = Pendaftaran::findOrFail($id);
-        $tglWawancara = $pendaftar->tgl_wawancara;
-
-        $validator = Validator::make($request->all(), [
-            'tgl_final' => 'required|date|after_or_equal:' . $tglWawancara,
-            'ket_wawancara' => 'nullable|string',
-        ], [
-            'tgl_final.required' => 'Tanggal selesai harus diisi.',
-            'tgl_final.date' => 'Format tanggal tidak valid.',
-            'tgl_final.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal wawancara.',
-            'ket_wawancara.string' => 'Catatan wawancara harus berupa teks.',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
         try {
             DB::beginTransaction();
 
             $pendaftar = Pendaftaran::findOrFail($id);
-            $pendaftar->tgl_final = $request->tgl_final;
-            $pendaftar->ket_wawancara = $request->ket_wawancara;
-            $pendaftar->status_daftar = 3;
-            $pendaftar->save();
+            $pendaftar->update([
+                'tgl_final' => $request->tgl_final,
+                'ket_wawancara' => $request->ket_wawancara,
+                'status_daftar' => 3
+            ]);
 
             DB::commit();
 
@@ -207,9 +181,7 @@ class PendaftaranController extends Controller
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat memperbarui data: ' . $e->getMessage()]);
         }
     }
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy($id)
     {
         try {

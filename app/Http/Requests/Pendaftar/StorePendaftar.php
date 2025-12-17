@@ -27,4 +27,19 @@ class StorePendaftar extends FormRequest
             'suket' => 'required|file|mimes:pdf|max:2048',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'nama.required' => 'Nama harus diisi.',
+            'nama.string' => 'Nama harus berupa string.',
+            'nama.max' => 'Nama maksimal 255 karakter.',
+            'telp_pendaftar.required' => 'Nomor Telepon harus diisi.',
+            'telp_pendaftar.numeric' => 'Nomor Telepon harus berupa angka.',
+            'suket.required' => 'Suket harus diisi.',
+            'suket.file' => 'Suket harus berupa file.',
+            'suket.mimes' => 'Suket harus berupa file PDF.',
+            'suket.max' => 'Suket maksimal 2MB.',
+        ];
+    }
 }
