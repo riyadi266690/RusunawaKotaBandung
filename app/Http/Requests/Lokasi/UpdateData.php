@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\DataLokasi;
+namespace App\Http\Requests\Lokasi;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,7 +22,8 @@ class UpdateData extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,' , $this->lokasi->id,
+            'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,',
+            $this->lokasi->id,
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
         ];
