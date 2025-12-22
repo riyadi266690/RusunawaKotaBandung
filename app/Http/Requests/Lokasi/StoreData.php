@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\DataLokasi;
+namespace App\Http\Requests\Lokasi;
 
 use Illuminate\Foundation\Http\FormRequest;
 

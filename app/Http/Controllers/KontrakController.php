@@ -84,39 +84,65 @@ class KontrakController extends Controller
 
     public function store(StoreKontrak $request)
     {
-        try {
-            DB::beginTransaction();
+        DB::beginTransaction();
 
+        try {
             $data = $request->validated();
             $data['status_kontrak'] = 1;
 
             $kontrak = Kontrak::create($data);
-            $kontrakId = $kontrak->id;
 
-            $this->generateDocument($kontrak, $data['tipe_kontrak']);
+            $generated = $this->generateDocument($kontrak, $data['tipe_kontrak']);
+
+            if (!$generated) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Kontrak tersimpan, tetapi dokumen gagal dibuat'
+                ], 201);
+            }
+
+            // $template = public_path('template_document/HUNIAN.docx');
 
             DB::commit();
-            return response()->json(['success' => true, 'message' => 'Kontrak berhasil dibuat.']);
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            Log::error('Gagal simpan kontrak: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menyimpan data kontrak'
+            ], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kontrak dan dokumen berhasil dibuat'
+        ], 201);
     }
 
-    private function generateDocument($kontrak, $tipe)
+    private function generateDocument($kontrak, $data): bool
     {
-        $filepath = storage_path('app/public/kontrak/' . $kontrak->id . '/');
-        if (!File::exists($filepath)) File::makeDirectory($filepath, 0777, true, true);
+        try {
+            $kontrak->load('penghuni');
 
-        $templatePath = ($tipe == 1)
-            ? public_path('template_document/HUNIAN.docx')
-            : public_path('template_document/RBH.docx');
+            $dir = storage_path("app/public/kontrak/{$kontrak->id}");
+            if (!File::exists($dir)) {
+                File::makeDirectory($dir, 0777, true);
+            }
 
-        if (file_exists($templatePath)) {
-            $templateProcessor = new TemplateProcessor($templatePath);
+            $template = $data == 1
+                ? public_path('template_document/HUNIAN.docx')
+                : public_path('template_document/RBH.docx');
 
-            $templateProcessor->setValues([
+            if (!file_exists($template)) {
+                Log::error("Template tidak ditemukan: $template");
+                return false;
+            }
+
+            $docxPath = "$dir/{$kontrak->id}.docx";
+            $pdfPath  = "$dir/{$kontrak->id}.pdf";
+
+            $processor = new TemplateProcessor($template);
+            $processor->setValues([
                 'no_kontrak' => $kontrak->no_kontrak,
                 'nama_pihak1' => strtoupper($kontrak->nama_pihak1),
                 'nama_penghuni' => strtoupper($kontrak->penghuni->nama ?? '-'),
@@ -128,21 +154,31 @@ class KontrakController extends Controller
                 'tgl_akhir' => Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y'),
             ]);
 
-            $docxPath = $filepath . $kontrak->id . '.docx';
-            $templateProcessor->saveAs($docxPath);
+            $processor->saveAs($docxPath);
 
-            try {
-                $converterPath = PHP_OS_FAMILY === 'Windows' ? 'C:\Program Files\LibreOffice\program\soffice' : null;
-                $convert = new OfficeConverter($docxPath, null, $converterPath, false);
-                $convert->convertTo($kontrak->id . '.pdf');
+            // $soffice = PHP_OS_FAMILY === 'Windows'
+            //     ? 'C:\\Program Files\\LibreOffice\\program\\soffice.exe'
+            //     : 'libreoffice';
 
-                $kontrak->update([
-                    'dok_kontrak' => 'kontrak/' . $kontrak->id . '/' . $kontrak->id . '.pdf',
-                    'status_ttd' => 1
-                ]);
-            } catch (\Exception $e) {
-                Log::warning('PDF Convert failed: ' . $e->getMessage());
-            }
+            // $cmd = "\"$soffice\" --headless --convert-to pdf \"$docxPath\" --outdir \"$dir\"";
+            // exec($cmd, $output, $resultCode);
+
+            // if (!file_exists($pdfPath)) {
+            //     Log::error('PDF tidak terbentuk', compact('cmd', 'output'));
+            //     return false;
+            // }
+
+            $kontrak->update([
+                'dok_kontrak' => "kontrak/{$kontrak->id}/{$kontrak->id}.docx",
+                'status_ttd' => 1
+            ]);
+
+            return true;
+        } catch (\Throwable $e) {
+            Log::error('Generate dokumen error', [
+                'msg' => $e->getMessage()
+            ]);
+            return false;
         }
     }
 

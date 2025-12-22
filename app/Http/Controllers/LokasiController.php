@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DataLokasi\StoreData;
-use App\Http\Requests\DataLokasi\UpdateData;
-use App\Http\Resources\Lokasi\LokasiResource;
 use App\Models\Lokasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Lokasi\StoreData;
+use App\Http\Requests\Lokasi\UpdateData;
+use App\Http\Resources\Lokasi\LokasiResource;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\HttpCache\Store;
 
 class LokasiController extends Controller
 {

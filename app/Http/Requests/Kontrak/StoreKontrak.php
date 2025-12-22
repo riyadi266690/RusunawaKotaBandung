@@ -34,17 +34,17 @@ class StoreKontrak extends FormRequest
             'tgl_akhir' => 'required|date|after_or_equal:tgl_awal',
             'nama_pihak1' => 'required|string|max:255',
             'status_ttd' => 'required|integer|in:0,1',
-            'penghuni_id1' => [
+            'penghuni_1' => [
                 'required',
                 'exists:penghuni,id',
                 function ($attribute, $value, $fail) {
                     $existing = Kontrak::where('status_kontrak', 1)
                         ->where('tipe_kontrak', $this->tipe_kontrak)
                         ->where(function ($query) use ($value) {
-                            $query->where('penghuni_id1', $value)
-                                ->orWhere('penghuni_id2', $value)
-                                ->orWhere('penghuni_id3', $value)
-                                ->orWhere('penghuni_id4', $value);
+                            $query->where('penghuni_1', $value)
+                                ->orWhere('penghuni_2', $value)
+                                ->orWhere('penghuni_3', $value)
+                                ->orWhere('penghuni_4', $value);
                         })->first();
 
                     if ($existing) {
@@ -52,9 +52,9 @@ class StoreKontrak extends FormRequest
                     }
                 }
             ],
-            'penghuni_id2' => 'nullable|exists:penghuni,id|different:penghuni_id1|different:penghuni_id3|different:penghuni_id4',
-            'penghuni_id3' => 'nullable|exists:penghuni,id|different:penghuni_id1|different:penghuni_id2|different:penghuni_id4',
-            'penghuni_id4' => 'nullable|exists:penghuni,id|different:penghuni_id1|different:penghuni_id2|different:penghuni_id3',
+            'penghuni_2' => 'nullable|exists:penghuni,id|different:penghuni_id1|different:penghuni_id3|different:penghuni_id4',
+            'penghuni_3' => 'nullable|exists:penghuni,id|different:penghuni_id1|different:penghuni_id2|different:penghuni_id4',
+            'penghuni_4' => 'nullable|exists:penghuni,id|different:penghuni_id1|different:penghuni_id2|different:penghuni_id3',
         ];
     }
 }
