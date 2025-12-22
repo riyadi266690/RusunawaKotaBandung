@@ -142,17 +142,23 @@ class KontrakController extends Controller
             $pdfPath  = "$dir/{$kontrak->id}.pdf";
 
             $processor = new TemplateProcessor($template);
-            $processor->setValues([
-                'no_kontrak' => $kontrak->no_kontrak,
-                'nama_pihak1' => strtoupper($kontrak->nama_pihak1),
-                'nama_penghuni' => strtoupper($kontrak->penghuni->nama ?? '-'),
-                'nik_penghuni' => $kontrak->penghuni->nik ?? '-',
-                'alamat_penghuni' => $kontrak->penghuni->alamat ?? '-',
-                'pekerjaan_penghuni' => $kontrak->penghuni->pekerjaan ?? '-',
-                'harga_sewa' => number_format($kontrak->harga_sewa, 0, ',', '.'),
-                'tgl_awal' => Carbon::parse($kontrak->tgl_awal)->translatedFormat('d F Y'),
-                'tgl_akhir' => Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y'),
-            ]);
+            $processor->setValue('no_kontrak', $kontrak->no_kontrak);
+            $processor->setValue('nama_pihak1', strtoupper($kontrak->nama_pihak1));
+            $processor->setValue('nama_penghuni', strtoupper($kontrak->penghuni->nama ?? '-'));
+            $processor->setValue('tempat_lahir', strtoupper($kontrak->penghuni->tempat_lahir ?? '-'));
+            $processor->setValue('tgl_lahir', strtoupper($kontrak->penghuni->tgl_lahir ?? '-'));
+            $processor->setValue('nik_penghuni', $kontrak->penghuni->nik ?? '-');
+            $processor->setValue('alamat_penghuni', $kontrak->penghuni->alamat ?? '-');
+            $processor->setValue('pekerjaan_penghuni', $kontrak->penghuni->pekerjaan ?? '-');
+            $processor->setValue('nomor', $kontrak->unit->nomor ?? '-');
+            $processor->setValue('lantai', $kontrak->unit->lantai ?? '-');
+            $processor->setValue('nama_gedung', $kontrak->unit->gedung->nama_gedung ?? '-');
+            $processor->setValue('lokasi', $kontrak->unit->gedung->lokasi->nama_lokasi ?? '-');
+            $processor->setValue('harga_sewa', number_format($kontrak->harga_sewa, 0, ',', '.'));
+            $processor->setValue('tgl_awal', Carbon::parse($kontrak->tgl_awal)->translatedFormat('d F Y'));
+            $processor->setValue('tgl_akhir', Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y'));
+
+
 
             $processor->saveAs($docxPath);
 

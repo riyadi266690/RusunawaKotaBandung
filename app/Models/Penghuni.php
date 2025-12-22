@@ -60,19 +60,19 @@ class Penghuni extends Model
     // app/Models/Penghuni.php
     public function kontrakAsPenghuni1()
     {
-        return $this->hasMany(Kontrak::class, 'penghuni_id1');
+        return $this->hasMany(Kontrak::class, 'penghuni_1');
     }
     public function kontrakAsPenghuni2()
     {
-        return $this->hasMany(Kontrak::class, 'penghuni_id2');
+        return $this->hasMany(Kontrak::class, 'penghuni_2');
     }
     public function kontrakAsPenghuni3()
     {
-        return $this->hasMany(Kontrak::class, 'penghuni_id3');
+        return $this->hasMany(Kontrak::class, 'penghuni_3');
     }
     public function kontrakAsPenghuni4()
     {
-        return $this->hasMany(Kontrak::class, 'penghuni_id4');
+        return $this->hasMany(Kontrak::class, 'penghuni_4');
     }
     // ... dan seterusnya untuk penghuni_id2, penghuni_id3, penghuni_id4
     // Relasi dengan model User

@@ -20,7 +20,7 @@ class Kontrak extends Model
     public function penghuni()
     {
 
-        return $this->belongsTo(Penghuni::class, 'penghuni_id1');
+        return $this->belongsTo(Penghuni::class, 'penghuni_1');
     }
 
     // Relasi ke User (created_by)
