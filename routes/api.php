@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::delete('/deleteGedung/{gedung}', [GedungController::class, 'destroyGedung']);
 
     // Pengaturan Unit
-    Route::get('/dataUnit', [UnitController::class, 'ajax_DTUnit']);
+    Route::get('/dataUnit', [UnitController::class, 'allDataUnit']);
     Route::post('/storeUnit', [UnitController::class, 'storeUnit']);
     Route::put('/updateUnit/{unit}', [UnitController::class, 'updateUnit']);
     Route::delete('/deleteUnit/{unit}', [UnitController::class, 'destroyUnit']);
