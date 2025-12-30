@@ -1952,6 +1952,7 @@ namespace App\Models {
      * @property string $nama
      * @property string|null $nik_hmac
      * @property string $nik
+     * @property mixed $user_id
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kontrak> $kontrakAsPenghuni1
      * @property-read int|null $kontrakAsPenghuni1_count
@@ -1965,6 +1966,7 @@ namespace App\Models {
      * @property-read \App\Models\User $updatedBy
      * @property-read \App\Models\User $deletedBy
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereUserId($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNik($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNikHmac($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Penghuni>|Penghuni whereNama($value)

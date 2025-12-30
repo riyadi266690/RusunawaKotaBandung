@@ -84,19 +84,29 @@ class UserController extends Controller
         }
     }
 
-    function destroy($id)
+    public function destroy(Request $request, $id)
     {
         try {
+            if ($request->user()->id == $id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal: Anda tidak boleh menghapus akun Anda sendiri!'
+                ], 403); 
+            }
+
             $user = User::find($id);
+            
+            if (!$user) {
+                return response()->json(['success' => false, 'message' => 'User tidak ditemukan'], 404);
+            }
+
             $user->delete();
+            
             return response()->json([
                 'success' => true,
                 'message' => 'User berhasil dihapus',
-                'data' => $user
             ]);
         } catch (\Exception $e) {
-            Log::error($e->getMessage());
-
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage()

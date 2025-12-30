@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Http\Requests\Kontrak\StoreKontrak;
 use App\Http\Requests\Kontrak\UpdateKontrak;
 use App\Http\Resources\Kontrak\KontrakResource;
@@ -11,6 +12,8 @@ use App\Models\Unit;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -78,6 +81,33 @@ class KontrakController extends Controller
             $data = $request->validated();
             $data['status_kontrak'] = 1;
             $kontrak = Kontrak::create($data);
+
+        $penghuni = Penghuni::find($data['penghuni_1']); // penghuni_1 adalah ID Penghuni
+        
+        if ($penghuni && $penghuni->email) {
+            $user = User::where('email', $penghuni->email)->first();
+            
+            if (!$user) {
+                $randomPassword = Str::random(8); 
+                
+                $user = User::create([
+                    'name' => $penghuni->nama,
+                    'email' => $penghuni->email,
+                    'password' => Hash::make('password'), 
+                    'role_id' => 3, 
+                    'unit_id' => $data['unit_id'] 
+                ]);
+                
+            } else {
+                $user->update([
+                    'unit_id' => $data['unit_id'],
+                    'role_id' => 3 
+                ]);
+            }
+            
+            $penghuni->update(['user_id' => $user->id]);
+        }
+        
             $generated = $this->generateDocument($kontrak, $data['tipe_kontrak']);
 
             if (!$generated) {
@@ -132,7 +162,7 @@ private function generateDocument($kontrak, $data): bool
             $processor->setValues([
                 'no_kontrak'       => $kontrak->no_kontrak,
                 'nama_pihak1'      => strtoupper($kontrak->nama_pihak1),
-                'nama_penghuni'    => strtoupper($kontrak->penghuni1->nama ?? '-'), // Ganti nama_penghuni1 jadi nama_penghuni
+                'nama_penghuni'    => strtoupper($kontrak->penghuni1->nama ?? '-'), 
                 'tempat_lahir'     => strtoupper($kontrak->penghuni1->tempat_lahir ?? '-'),
                 'tgl_lahir'        => $kontrak->penghuni1->tgl_lahir ? Carbon::parse($kontrak->penghuni1->tgl_lahir)->translatedFormat('d F Y') : '-',
                 'nik_penghuni'     => $kontrak->penghuni1->nik ?? '-',
@@ -162,7 +192,6 @@ private function generateDocument($kontrak, $data): bool
                 $processor->setValue('ttd_pihak1', ''); 
             }
 
-            // $processor->setValue('ttd_penghuni', ''); 
             $fileName = $kontrak->id . '.docx';
             $docxPath = "$dir/$fileName";
             $processor->saveAs($docxPath);

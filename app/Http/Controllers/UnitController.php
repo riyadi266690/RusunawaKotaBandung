@@ -49,10 +49,10 @@ class UnitController extends Controller
                 'unit.tipe_unit',
                 'unit.status_jual',
                 'gedung.nama_gedung as gedung_nama',
-                'lokasi.nama_lokasi as lokasi_nama' // Tambahkan ini
+                'lokasi.nama_lokasi as lokasi_nama' 
             )
             ->join('gedung', 'unit.gedung_id', '=', 'gedung.id')
-            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id') // Tambahkan join ke lokasi
+            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id') 
             ->orderBy('unit.id', 'desc');
         return DataTables::of($query)
             ->addColumn('gedung', function ($unit) {

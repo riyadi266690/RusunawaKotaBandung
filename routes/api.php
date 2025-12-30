@@ -8,10 +8,13 @@ use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\GedungController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LokasiController;
+use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenghuniController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
+use App\Models\Pegawai;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 Route::post('/authenticate', [AuthController::class, 'authenticate']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
@@ -73,12 +76,8 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::put('/updateUnit/{unit}', [UnitController::class, 'updateUnit']);
     Route::delete('/deleteUnit/{unit}', [UnitController::class, 'destroyUnit']);
 
-    Route::get('/laporan', [LaporanController::class, 'index']); 
-    Route::post('/laporan', [LaporanController::class, 'store']);
     Route::put('/laporan/{id}', [LaporanController::class, 'update']);
-    Route::get('/list-pegawai', function() {
-        return response()->json(\App\Models\Pegawai::all());
-    });
+    Route::get('/pegawai', [PegawaiController::class, 'index']);
 
 });
 
@@ -89,7 +88,10 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->grou
     Route::delete('/deleteUser/{user}', [UserController::class, 'destroy']);
 });
 
-Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Penghuni'])->group(function () {
+Route::middleware(['auth:sanctum', 'token.expiry'])->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index']); 
     Route::post('/laporan', [LaporanController::class, 'store']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });

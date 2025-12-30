@@ -29,9 +29,9 @@ return new class extends Migration
             $table->string('jenis_usaha')->nullable();
             $table->double('luas_usaha')->nullable();
             $table->foreignId('penghuni_1')->references('id')->on('penghuni')->onDelete('cascade');
-            $table->foreignId('penghuni_2')->references('id')->on('penghuni')->onDelete('cascade');
-            $table->foreignId('penghuni_3')->references('id')->on('penghuni')->onDelete('cascade');
-            $table->foreignId('penghuni_4')->references('id')->on('penghuni')->onDelete('cascade');
+            $table->foreignId('penghuni_2')->nullable()->references('id')->on('penghuni')->onDelete('cascade');
+            $table->foreignId('penghuni_3')->nullable()->references('id')->on('penghuni')->onDelete('cascade');
+            $table->foreignId('penghuni_4')->nullable()->references('id')->on('penghuni')->onDelete('cascade');
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('updated_by')->nullable()->constrained('users')->onDelete('set null');
             $table->foreignId('deleted_by')->nullable()->constrained('users')->onDelete('set null');
