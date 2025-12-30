@@ -8,21 +8,15 @@ use Illuminate\Support\Facades\Validator;
 
 class LaporanController extends Controller
 {
-    // 1. LIHAT DATA (PINTAR MEMBEDAKAN ROLE)
     public function index(Request $request)
     {
         $user = $request->user();
         $query = Laporan::with(['user', 'unit', 'pegawai'])->latest();
 
-        // LOGIC PEMBEDA:
-        // Jika role user BUKAN Penghuni (artinya Admin/Super Admin), tampilkan semua.
-        // Asumsi ID Role: 1=Super Admin, 2=Admin, 3=Penghuni
         if ($user->role_id == 3) {
-            // Kalau Penghuni, filter punya dia aja
             $query->where('user_id', $user->id);
         }
 
-        // Kalau Admin, code di atas di-skip, jadi dia ambil semua data.
         
         return response()->json([
             'success' => true,
@@ -30,7 +24,6 @@ class LaporanController extends Controller
         ]);
     }
 
-    // 2. KIRIM LAPORAN (MASIH SAMA)
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
