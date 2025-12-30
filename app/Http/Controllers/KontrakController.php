@@ -162,7 +162,7 @@ private function generateDocument($kontrak, $data): bool
                 $processor->setValue('ttd_pihak1', ''); 
             }
 
-            $processor->setValue('ttd_penghuni', ''); 
+            // $processor->setValue('ttd_penghuni', ''); 
             $fileName = $kontrak->id . '.docx';
             $docxPath = "$dir/$fileName";
             $processor->saveAs($docxPath);

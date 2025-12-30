@@ -25,6 +25,7 @@ class StoreUser extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|confirmed',
+            'role_id' => 'required|integer|exists:role,id',
         ];
     }
 
@@ -43,6 +44,9 @@ class StoreUser extends FormRequest
             'password.string' => 'Password harus berupa string.',
             'password.min' => 'Password minimal 6 karakter.',
             'password.confirmed' => 'Password tidak cocok.',
+            'role_id.required' => 'Role wajib dipilih.',
+            'role_id.integer' => 'Format role tidak valid.',
+            'role_id.exists' => 'Role yang dipilih tidak tersedia di database.',
         ];
     }
 }

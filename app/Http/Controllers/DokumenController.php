@@ -18,7 +18,7 @@ class DokumenController extends Controller
     {
         try {
             $kontrak = Kontrak::findOrFail($id);
-            
+
             $file = $request->file('file_revisi');
             $extension = $file->getClientOriginalExtension();
             $fileName = $kontrak->id . '_revisi_' . time() . '.' . $extension;
@@ -35,7 +35,6 @@ class DokumenController extends Controller
                 'message' => 'Dokumen revisi berhasil diupload!',
                 'path' => $path
             ]);
-
         } catch (\Exception $e) {
             Log::error("Upload Revisi Error: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Gagal upload: ' . $e->getMessage()], 500);
@@ -46,41 +45,48 @@ class DokumenController extends Controller
     {
         try {
             $kontrak = Kontrak::findOrFail($id);
-            
+
             $relativePath = $kontrak->dok_kontrak;
             $fullPath = storage_path('app/public/' . $relativePath);
-            
+
             if (!file_exists($fullPath)) {
                 return response()->json(['success' => false, 'message' => 'Dokumen fisik tidak ditemukan.'], 404);
             }
 
             $image_parts = explode(";base64,", $request->signature_image);
             $image_base64 = base64_decode($image_parts[1]);
+
+            $tempDir = storage_path('app/public/temp');
+            if (!file_exists($tempDir)) mkdir($tempDir, 0777, true);
+
             $tempImageName = 'temp_ttd_' . $kontrak->id . '_' . time() . '.png';
-            $tempImagePath = storage_path('app/public/temp/' . $tempImageName);
-            
-            if (!file_exists(dirname($tempImagePath))) mkdir(dirname($tempImagePath), 0777, true);
+            $tempImagePath = $tempDir . '/' . $tempImageName;
+
             file_put_contents($tempImagePath, $image_base64);
 
             $templateProcessor = new TemplateProcessor($fullPath);
+
             $templateProcessor->setImageValue('ttd_penghuni', [
                 'path' => $tempImagePath,
-                'width' => 100,   
-                'height' => 50,   
+                'width' => 200,
+                'height' => 200,
                 'ratio' => true
             ]);
-            
-            $templateProcessor->saveAs($fullPath);
+
+            $tempOutputPath = $tempDir . '/output_' . $kontrak->id . '_' . time() . '.docx';
+            $templateProcessor->saveAs($tempOutputPath);
+
+            if (file_exists($tempOutputPath)) {
+                if (file_exists($fullPath)) unlink($fullPath);
+                rename($tempOutputPath, $fullPath);
+            }
 
             if (file_exists($tempImagePath)) unlink($tempImagePath);
-
             $kontrak->update(['status_ttd' => 2]);
-
             return response()->json([
                 'success' => true,
                 'message' => 'Dokumen berhasil ditandatangani secara digital!'
             ]);
-
         } catch (\Exception $e) {
             Log::error("Sign Document Error: " . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Gagal tanda tangan: ' . $e->getMessage()], 500);

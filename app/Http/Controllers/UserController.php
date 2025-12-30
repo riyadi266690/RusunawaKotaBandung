@@ -40,7 +40,7 @@ class UserController extends Controller
                 'name'     => $validated['name'],
                 'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
-                'role_id'  => 2,
+                'role_id'  => $validated['role_id'],
             ]);
 
             return response()->json([
