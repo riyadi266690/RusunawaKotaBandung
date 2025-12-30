@@ -8,14 +8,14 @@
       <div class="card">
         <div class="row">
           <div class="col-md-4 pe-md-0">
-            <div class="auth-side-wrapper" style="background-image: url({{ asset('assets/images/others/login.jpg') }})">
+            <div class="auth-side-wrapper" style="background-image: url({{ asset('assets/images/others/siraja.png') }})">
 
             </div>
           </div>
           <div class="col-md-8 ps-md-0">
             <div class="auth-form-wrapper px-4 py-5">
-              <a href="#" class="noble-ui-logo d-block mb-2">UPTD<span> Rumah Susun</span></a>
-              <h5 class="text-muted fw-normal mb-4">Kabupaten Bandung</h5>
+              <a href="#" class="noble-ui-logo d-block mb-2">SiRAJA<span> BALAREA</span></a>
+              <h5 class="text-muted fw-normal mb-4">Hunian Nyaman dan Berkelanjutan</h5>
               <form class="forms-sample form-adi" method="POST" action="{{ route('auth.authenticate') }}">
               @csrf
                 <div class="mb-3">

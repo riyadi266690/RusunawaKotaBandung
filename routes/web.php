@@ -51,7 +51,7 @@ Route::prefix($prefix)->group(function () {
     });
 
     // Route untuk Pengaturan (Lokasi dan Gedung)
-    Route::prefix('pengaturan')->name('pengaturan.')->group(function () {
+    Route::prefix('pengaturan')->name('pengaturan.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function () {
         Route::get('/', [PengaturanController::class, 'index'])->name('index');
         Route::get('/ajax-dtlokasi', [PengaturanController::class, 'ajax_DTLokasi'])->name('ajax.DTLokasi');
         Route::get('/ajax-dtgedung', [PengaturanController::class, 'ajax_DTGedung'])->name('ajax.DTGedung');
@@ -84,7 +84,11 @@ Route::prefix($prefix)->group(function () {
     });
 
     // Route untuk Kontrak
+<<<<<<< HEAD
     Route::prefix('kontrak')->name('kontrak.')->group(function () {
+=======
+    Route::prefix('kontrak')->name('kontrak.')->middleware(['auth', 'CekUser', 'BackHistory'])->group(function() {
+>>>>>>> 5c6a2b57844312b01f859e1310df9b6d880a8244
         Route::get('aktif', [KontrakController::class, 'kontrakAktif'])->name('aktif');
         Route::get('non_aktif', [KontrakController::class, 'kontrakNonAktif'])->name('non_aktif'); // Akan diimplementasikan nanti
 

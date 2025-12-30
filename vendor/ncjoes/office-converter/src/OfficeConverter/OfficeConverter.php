@@ -140,10 +140,23 @@ class OfficeConverter
 
         $randomNumber = mt_rand(1, 20);
 
-        // Add the userInstallationDirectory option
-        $userInstallationDirectoryOption = "-env:UserInstallation=file://{$_SERVER['HOME']}/.config/libreoffice-profile{$randomNumber}";
-
-        return "\"$this->bin\" --headless --convert-to {$outputExtension}{$this->filter} $userInstallationDirectoryOption $oriFile --outdir $outputDirectory";
+         // Add the userInstallationDirectory option
+        $homeDirectory = getenv('HOME') ?: posix_getpwuid(posix_getuid())['dir'];
+        $userInstallationDirectoryOption = "-env:UserInstallation=file://{$homeDirectory}/.config/libreoffice-profile{$randomNumber}";
+        // Tentukan jalur LibreOffice berdasarkan sistem operasi
+        if (PHP_OS_FAMILY === 'Windows') {
+            $binPath = 'C:\\Program Files\\LibreOffice\\program\\soffice.exe';
+        } elseif (PHP_OS_FAMILY === 'Linux') {
+            $binPath = '/usr/bin/libreoffice';
+        } elseif (PHP_OS_FAMILY === 'Darwin') { // 'Darwin' adalah nama kernel untuk macOS
+            $binPath = '/Applications/LibreOffice.app/Contents/MacOS/soffice';
+        } else {
+            // Fallback untuk sistem lain jika diperlukan
+            $binPath = 'libreoffice'; 
+        }
+        return "\"{$binPath}\" --headless --convert-to {$outputExtension}{$this->filter} $userInstallationDirectoryOption $oriFile --outdir $outputDirectory";
+        
+        //return "\"$this->bin\" --headless --convert-to {$outputExtension}{$this->filter} $userInstallationDirectoryOption $oriFile --outdir $outputDirectory";
     }
 
     /**

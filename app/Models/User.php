@@ -56,4 +56,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Lokasi::class);
     }
+    public function lokasi()
+    {
+        // User memiliki banyak Lokasi
+        return $this->belongsToMany(Lokasi::class, 'lokasi_user', 'user_id', 'lokasi_id');
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
@@ -35,6 +36,26 @@ class Pendaftaran extends Model
             } 
             // Tidak perlu memanggil $model->save() di sini.
             // Laravel akan menyimpannya saat proses soft delete.
+        });
+    }
+    public function lokasi()
+    {
+        return $this->belongsTo(Lokasi::class, 'lokasi_id');
+    }
+
+    /**
+     * Local Scope: Memfilter Pendaftar yang hanya terkait dengan Lokasi 
+     * yang diakses oleh user pengelola yang sedang login.
+     */
+    public function scopeAksesUser(Builder $query): void
+    {
+        // Filter Pendaftar yang memiliki relasi ke Lokasi
+        $query->whereHas('lokasi', function ($qLokasi) {
+            
+            // Di dalam Lokasi, filter lagi berdasarkan relasi ke users (tabel pivot)
+            $qLokasi->whereHas('users', function ($qUser) {
+                $qUser->where('user_id', Auth::id());
+            });
         });
     }
     

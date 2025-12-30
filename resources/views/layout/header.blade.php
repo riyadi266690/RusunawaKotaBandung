@@ -3,7 +3,7 @@
     <div class="container">
       <div class="navbar-content">
         <a href="#" class="navbar-brand">
-          UPTD<span> Rusunawa</span>
+          SiRAJA BALAREA<span>- Sistem Informasi Rusun Jawa Barat Keur Balarea</span>
         </a>
         
         <ul class="navbar-nav">
