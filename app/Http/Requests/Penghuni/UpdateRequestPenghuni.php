@@ -12,7 +12,7 @@ class UpdateRequestPenghuni extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     protected function prepareForValidation(): void
@@ -25,15 +25,16 @@ class UpdateRequestPenghuni extends FormRequest
 
     public function rules(): array
     {
+        $id = $this->route('id');
         return [
             'email' => [
                 'required',
                 'email',
-                Rule::unique('penghuni', 'email')->ignore($this->penghuni->id),
+                Rule::unique('penghuni', 'email')->ignore($id),
             ],
             'no_tlp' => [
                 'required',
-                Rule::unique('penghuni', 'no_tlp')->ignore($this->penghuni->id),
+                Rule::unique('penghuni', 'no_tlp')->ignore($id),
             ],
             'nama' => 'required|string|max:255',
             'tgl_lahir' => 'required|date',

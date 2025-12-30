@@ -17,10 +17,25 @@ class Kontrak extends Model
     }
 
     // Relasi ke Penghuni 
-    public function penghuni()
+    public function penghuni1()
     {
 
         return $this->belongsTo(Penghuni::class, 'penghuni_1');
+    }
+    public function penghuni2()
+    {
+
+        return $this->belongsTo(Penghuni::class, 'penghuni_2');
+    }
+    public function penghuni3()
+    {
+
+        return $this->belongsTo(Penghuni::class, 'penghuni_3');
+    }
+    public function penghuni4()
+    {
+
+        return $this->belongsTo(Penghuni::class, 'penghuni_4');
     }
 
     // Relasi ke User (created_by)

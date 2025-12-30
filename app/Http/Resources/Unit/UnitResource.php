@@ -16,6 +16,7 @@ class UnitResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
+            'id' => $this->id,
             'nomor_unit' => $this->nomor,
             'lantai' => $this->lantai,
             'tipe_unit' => $this->tipe_unit,

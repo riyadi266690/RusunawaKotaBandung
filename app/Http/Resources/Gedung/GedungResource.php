@@ -18,7 +18,7 @@ class GedungResource extends JsonResource
         return [
             'id_gedung' => $this->id,
             'nama_gedung' => $this->nama_gedung,
-            'tipe_gedung' => $this->type_gedung,
+            'tipe_gedung' => $this->tipe_gedung,
             'alamat_gedung' => new LokasiResource($this->whenLoaded('lokasi')),
         ];
     }

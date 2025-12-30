@@ -24,6 +24,11 @@ class RoleSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'nama_role' => 'Penghuni',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
     }
 }

@@ -17,6 +17,7 @@ class LokasiResource extends JsonResource
         return [
             'id_lokasi' => $this->id,
             'nama_lokasi' => $this->nama_lokasi,
+            'kepala_lokasi' => $this->kepala_lokasi,
             'alamat_lokasi' => $this->alamat_lokasi,
         ];
     }

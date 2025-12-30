@@ -19,61 +19,49 @@ use PhpOffice\PhpWord\TemplateProcessor;
 
 class KontrakController extends Controller
 {
-    public function kontrakAktif()
+    public function kontrakAktif(Request $request)
     {
-        $kontrak = Kontrak::with(['unit.gedung.lokasi', 'penghuni'])
-            ->where('status_kontrak', 1)
-            ->orderBy('id', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'no_kontrak' => $item->no_kontrak,
-                    'nama_pihak1' => $item->nama_pihak1,
-                    'nama_penghuni' => $item->penghuni->nama ?? '-',
-                    'lokasi_nama' => $item->unit->gedung->lokasi->nama_lokasi ?? '-',
-                    'gedung_nama' => $item->unit->gedung->nama_gedung ?? '-',
-                    'unit_lantai' => $item->unit->lantai ?? '-',
-                    'unit_nomor' => $item->unit->nomor ?? '-',
-                    'tgl_awal' => $item->tgl_awal,
-                    'tgl_akhir' => $item->tgl_akhir,
-                    'harga_sewa' => $item->harga_sewa,
-                    'dok_kontrak' => $item->dok_kontrak
-                ];
-            });
+        $query = Kontrak::with([
+            'unit.gedung.lokasi',
+            'penghuni1', 
+            'penghuni2', 
+            'penghuni3', 
+            'penghuni4'  
+        ])
+        ->where('status_kontrak', 1)
+        ->orderBy('id', 'desc');
 
-        return response()->json(
-            [
-                'message' => 'Data ditemukan',
-                'data' => KontrakResource::collection($kontrak)
-            ]
-        );
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('no_kontrak', 'like', "%{$search}%")
+                  ->orWhereHas('penghuni1', function($subQ) use ($search) {
+                      $subQ->where('nama', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $kontrak = $query->get();
+
+        return response()->json([
+            'message' => 'Data ditemukan',
+            'data' => KontrakResource::collection($kontrak)
+        ]);
     }
 
     public function kontrakNonAktif()
     {
-        $kontrak = Kontrak::with(['unit.gedung.lokasi', 'penghuni'])
-            ->where('status_kontrak', 0)
-            ->orderBy('tgl_keluar', 'desc')
-            ->orderBy('updated_at', 'desc')
-            ->get()
-            ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'no_kontrak' => $item->no_kontrak,
-                    'nama_penghuni' => $item->penghuni->nama ?? 'Penghuni Terhapus',
-                    'lokasi_nama' => $item->unit->gedung->lokasi->nama_lokasi ?? '-',
-                    'gedung_nama' => $item->unit->gedung->nama_gedung ?? '-',
-                    'unit_lantai' => $item->unit->lantai ?? '-',
-                    'unit_nomor' => $item->unit->nomor ?? '-',
-                    'tgl_awal' => $item->tgl_awal,
-                    'tgl_akhir' => $item->tgl_akhir,
-                    'tgl_keluar' => $item->tgl_keluar,
-                    'masa_kontrak' => $item->masa_kontrak,
-                    'dok_kontrak' => $item->dok_kontrak,
-                    'keterangan' => 'Kontrak Berakhir/Diputus'
-                ];
-            });
+        $kontrak = Kontrak::with([
+            'unit.gedung.lokasi',
+            'penghuni1',
+            'penghuni2',
+            'penghuni3',
+            'penghuni4'
+        ])
+        ->where('status_kontrak', 0)
+        ->orderBy('tgl_keluar', 'desc')
+        ->orderBy('updated_at', 'desc')
+        ->get();
 
         return response()->json([
             'success' => true,
@@ -89,19 +77,16 @@ class KontrakController extends Controller
         try {
             $data = $request->validated();
             $data['status_kontrak'] = 1;
-
             $kontrak = Kontrak::create($data);
-
             $generated = $this->generateDocument($kontrak, $data['tipe_kontrak']);
 
             if (!$generated) {
+                DB::commit(); 
                 return response()->json([
                     'success' => true,
                     'message' => 'Kontrak tersimpan, tetapi dokumen gagal dibuat'
                 ], 201);
             }
-
-            // $template = public_path('template_document/HUNIAN.docx');
 
             DB::commit();
         } catch (\Exception $e) {
@@ -109,7 +94,7 @@ class KontrakController extends Controller
             Log::error('Gagal simpan kontrak: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Gagal menyimpan data kontrak'
+                'message' => 'Gagal menyimpan data kontrak: ' . $e->getMessage()
             ], 500);
         }
 
@@ -119,10 +104,10 @@ class KontrakController extends Controller
         ], 201);
     }
 
-    private function generateDocument($kontrak, $data): bool
+private function generateDocument($kontrak, $data): bool
     {
         try {
-            $kontrak->load('penghuni');
+            $kontrak->load('penghuni1', 'unit.gedung.lokasi');
 
             $dir = storage_path("app/public/kontrak/{$kontrak->id}");
             if (!File::exists($dir)) {
@@ -138,56 +123,62 @@ class KontrakController extends Controller
                 return false;
             }
 
-            $docxPath = "$dir/{$kontrak->id}.docx";
-            $pdfPath  = "$dir/{$kontrak->id}.pdf";
-
             $processor = new TemplateProcessor($template);
-            $processor->setValue('no_kontrak', $kontrak->no_kontrak);
-            $processor->setValue('nama_pihak1', strtoupper($kontrak->nama_pihak1));
-            $processor->setValue('nama_penghuni', strtoupper($kontrak->penghuni->nama ?? '-'));
-            $processor->setValue('tempat_lahir', strtoupper($kontrak->penghuni->tempat_lahir ?? '-'));
-            $processor->setValue('tgl_lahir', strtoupper($kontrak->penghuni->tgl_lahir ?? '-'));
-            $processor->setValue('nik_penghuni', $kontrak->penghuni->nik ?? '-');
-            $processor->setValue('alamat_penghuni', $kontrak->penghuni->alamat ?? '-');
-            $processor->setValue('pekerjaan_penghuni', $kontrak->penghuni->pekerjaan ?? '-');
-            $processor->setValue('nomor', $kontrak->unit->nomor ?? '-');
-            $processor->setValue('lantai', $kontrak->unit->lantai ?? '-');
-            $processor->setValue('nama_gedung', $kontrak->unit->gedung->nama_gedung ?? '-');
-            $processor->setValue('lokasi', $kontrak->unit->gedung->lokasi->nama_lokasi ?? '-');
-            $processor->setValue('harga_sewa', number_format($kontrak->harga_sewa, 0, ',', '.'));
-            $processor->setValue('tgl_awal', Carbon::parse($kontrak->tgl_awal)->translatedFormat('d F Y'));
-            $processor->setValue('tgl_akhir', Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y'));
 
+            $hargaTerbilang = function_exists('terbilang') 
+                ? ucwords(terbilang($kontrak->harga_sewa)) . ' Rupiah' 
+                : $kontrak->harga_sewa . ' Rupiah';
 
+            $processor->setValues([
+                'no_kontrak'       => $kontrak->no_kontrak,
+                'nama_pihak1'      => strtoupper($kontrak->nama_pihak1),
+                'nama_penghuni'    => strtoupper($kontrak->penghuni1->nama ?? '-'), // Ganti nama_penghuni1 jadi nama_penghuni
+                'tempat_lahir'     => strtoupper($kontrak->penghuni1->tempat_lahir ?? '-'),
+                'tgl_lahir'        => $kontrak->penghuni1->tgl_lahir ? Carbon::parse($kontrak->penghuni1->tgl_lahir)->translatedFormat('d F Y') : '-',
+                'nik_penghuni'     => $kontrak->penghuni1->nik ?? '-',
+                'alamat_penghuni'  => $kontrak->penghuni1->alamat ?? '-',
+                'pekerjaan_penghuni' => $kontrak->penghuni1->pekerjaan ?? '-',
+                'nomor'            => $kontrak->unit->nomor ?? '-',
+                'lantai'           => $kontrak->unit->lantai ?? '-',
+                'nama_gedung'      => $kontrak->unit->gedung->nama_gedung ?? '-',
+                'lokasi'           => $kontrak->unit->gedung->lokasi->nama_lokasi ?? '-',
+                'harga_sewa'       => number_format($kontrak->harga_sewa, 0, ',', '.'),
+                'harga_sewa_bahasa'=> $hargaTerbilang, 
+                'tahun'            => Carbon::now()->year,
+                'tgl_awal'         => Carbon::parse($kontrak->tgl_awal)->translatedFormat('d F Y'),
+                'tgl_akhir'        => Carbon::parse($kontrak->tgl_akhir)->translatedFormat('d F Y'),
+            ]);
 
+            $pathTtdPejabat = public_path('assets/images/favicon.png'); 
+
+            if (file_exists($pathTtdPejabat)) {
+                $processor->setImageValue('ttd_pihak1', [
+                    'path' => $pathTtdPejabat,
+                    'width' => 150,   
+                    'height' => 80,   
+                    'ratio' => true
+                ]);
+            } else {
+                $processor->setValue('ttd_pihak1', ''); 
+            }
+
+            $processor->setValue('ttd_penghuni', ''); 
+            $fileName = $kontrak->id . '.docx';
+            $docxPath = "$dir/$fileName";
             $processor->saveAs($docxPath);
 
-            // $soffice = PHP_OS_FAMILY === 'Windows'
-            //     ? 'C:\\Program Files\\LibreOffice\\program\\soffice.exe'
-            //     : 'libreoffice';
-
-            // $cmd = "\"$soffice\" --headless --convert-to pdf \"$docxPath\" --outdir \"$dir\"";
-            // exec($cmd, $output, $resultCode);
-
-            // if (!file_exists($pdfPath)) {
-            //     Log::error('PDF tidak terbentuk', compact('cmd', 'output'));
-            //     return false;
-            // }
-
             $kontrak->update([
-                'dok_kontrak' => "kontrak/{$kontrak->id}/{$kontrak->id}.docx",
-                'status_ttd' => 1
+                'dok_kontrak' => "kontrak/{$kontrak->id}/$fileName",
+                'status_ttd' => 1 
             ]);
 
             return true;
+
         } catch (\Throwable $e) {
-            Log::error('Generate dokumen error', [
-                'msg' => $e->getMessage()
-            ]);
+            Log::error('Generate dokumen error: ' . $e->getMessage());
             return false;
         }
     }
-
     public function getPenghuniOptions(Request $request)
     {
         $query = Penghuni::select('id', 'nama', 'nik');

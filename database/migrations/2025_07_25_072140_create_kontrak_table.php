@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('tipe_kontrak');
             $table->date('tgl_awal');
             $table->date('tgl_akhir');
-            $table->date('tgl_keluar');
+            $table->date('tgl_keluar')->nullable();
             $table->integer('masa_kontrak')->nullable();
             $table->integer('status_kontrak');
             $table->string('nama_pihak1');

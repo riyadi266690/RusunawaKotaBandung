@@ -4,7 +4,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KontrakController;
 use App\Http\Controllers\PendaftaranController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DokumenController;
 use App\Http\Controllers\GedungController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\PenghuniController;
 use App\Http\Controllers\UnitController;
@@ -41,6 +43,9 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::post('/storeKontrak', [KontrakController::class, 'store']);
     Route::put('/putusKontrak/{kontrak}', [KontrakController::class, 'putusKontrak']);
 
+    Route::post('/kontrak/upload-revisi/{id}', [DokumenController::class, 'uploadRevisi']);
+    Route::post('/kontrak/sign/{id}', [DokumenController::class, 'signDocument']);
+
     // Kontrak Non Aktif
     Route::get('/dataKontrakNonAktif', [KontrakController::class, 'kontrakNonAktif']);
     Route::post('/dataKontrakNonAktif/{data}', [KontrakController::class, 'ajax_DTKontrakNonAktif']);
@@ -67,6 +72,14 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::post('/storeUnit', [UnitController::class, 'storeUnit']);
     Route::put('/updateUnit/{unit}', [UnitController::class, 'updateUnit']);
     Route::delete('/deleteUnit/{unit}', [UnitController::class, 'destroyUnit']);
+
+    Route::get('/laporan', [LaporanController::class, 'index']); 
+    Route::post('/laporan', [LaporanController::class, 'store']);
+    Route::put('/laporan/{id}', [LaporanController::class, 'update']);
+    Route::get('/list-pegawai', function() {
+        return response()->json(\App\Models\Pegawai::all());
+    });
+
 });
 
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->group(function () {
@@ -74,4 +87,9 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->grou
     Route::post('/storeUser', [UserController::class, 'store']);
     Route::put('/updateUser/{user}', [UserController::class, 'update']);
     Route::delete('/deleteUser/{user}', [UserController::class, 'destroy']);
+});
+
+Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Penghuni'])->group(function () {
+    Route::get('/laporan', [LaporanController::class, 'index']); 
+    Route::post('/laporan', [LaporanController::class, 'store']);
 });

@@ -29,7 +29,8 @@ class UpdateTanggalSelesaiPendaftaran extends FormRequest
     {
         return [
             'tgl_final' => [
-                'required|date',
+                'required',
+                'date',
                 'after_or_equal:' . $this->tglWawancara
             ],
             'ket_wawancara' => 'nullable|string',

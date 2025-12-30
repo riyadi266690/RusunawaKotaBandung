@@ -30,10 +30,10 @@ class KontrakResource extends JsonResource
             'jenis_usaha' => $this->jenis_usaha,
             'luas_usaha' => $this->luas_usaha,
             'dokumen_kontrak' => $this->dok_kontrak,
-            'penghuni_1' => new PenghuniResource($this->whenLoaded('penghuni')),
-            'penghuni_2' => new PenghuniResource($this->whenLoaded('penghuni')),
-            'penghuni_3' => new PenghuniResource($this->whenLoaded('penghuni')),
-            'penghuni_4' => new PenghuniResource($this->whenLoaded('penghuni')),
+            'penghuni_1' => new PenghuniResource($this->whenLoaded('penghuni1')),
+            'penghuni_2' => new PenghuniResource($this->whenLoaded('penghuni2')),
+            'penghuni_3' => new PenghuniResource($this->whenLoaded('penghuni3')),
+            'penghuni_4' => new PenghuniResource($this->whenLoaded('penghuni4')),
             'unit' => new UnitResource($this->whenLoaded('unit')),
         ];
     }
