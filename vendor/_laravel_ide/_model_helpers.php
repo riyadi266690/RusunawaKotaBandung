@@ -670,9 +670,29 @@ namespace App\Models {
     /**
      * App\Models\Laporan
      *
+     * @property \Illuminate\Support\Carbon|null $updated_at
+     * @property \Illuminate\Support\Carbon|null $created_at
+     * @property mixed $pegawai_id
+     * @property mixed $status
+     * @property string|null $foto
+     * @property string $deskripsi
+     * @property string $judul
+     * @property mixed $unit_id
+     * @property mixed $user_id
+     * @property int $id
      * @property-read \App\Models\User $user
      * @property-read \App\Models\Unit $unit
      * @property-read \App\Models\Pegawai $pegawai
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereUserId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereUnitId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereJudul($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereDeskripsi($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereFoto($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereStatus($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan wherePegawaiId($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereCreatedAt($value)
+     * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan whereUpdatedAt($value)
      * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan newModelQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan newQuery()
      * @method static \Illuminate\Database\Eloquent\Builder<Laporan>|Laporan query()
