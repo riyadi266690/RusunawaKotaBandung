@@ -79,6 +79,10 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::put('/laporan/{id}', [LaporanController::class, 'update']);
     Route::get('/pegawai', [PegawaiController::class, 'index']);
 
+    // Laporan 
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });
 
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->group(function () {
@@ -88,10 +92,7 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->grou
     Route::delete('/deleteUser/{user}', [UserController::class, 'destroy']);
 });
 
-Route::middleware(['auth:sanctum', 'token.expiry'])->group(function () {
-    Route::get('/laporan', [LaporanController::class, 'index']); 
+Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin,Penghuni'])->group(function () {
+    Route::get('/laporan', [LaporanController::class, 'index']);
     Route::post('/laporan', [LaporanController::class, 'store']);
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
 });

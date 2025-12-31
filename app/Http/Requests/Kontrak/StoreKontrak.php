@@ -54,6 +54,7 @@ class StoreKontrak extends FormRequest
             ],
             'penghuni_2' => 'nullable|exists:penghuni,id|different:penghuni_1|different:penghuni_3|different:penghuni_4',
             'penghuni_3' => 'nullable|exists:penghuni,id|different:penghuni_1|different:penghuni_2|different:penghuni_4',
-            'penghuni_4' => 'nullable|exists:penghuni,id|different:penghuni_1|different:penghuni_2|different:penghuni_3',        ];
+            'penghuni_4' => 'nullable|exists:penghuni,id|different:penghuni_1|different:penghuni_2|different:penghuni_3',
+        ];
     }
 }
