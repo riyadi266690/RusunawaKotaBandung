@@ -10,6 +10,12 @@ class Kontrak extends Model
     protected $table = 'kontrak';
     protected $guarded = [];
 
+    // Relasi user
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     // Relasi ke Unit
     public function unit()
     {

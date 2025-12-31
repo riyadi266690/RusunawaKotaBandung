@@ -45,9 +45,10 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::get('/getPenghuniOption', [KontrakController::class, 'getPenghuniOptions']);
     Route::post('/storeKontrak', [KontrakController::class, 'store']);
     Route::put('/putusKontrak/{kontrak}', [KontrakController::class, 'putusKontrak']);
+    Route::delete('/hapusKontrak/{kontrak}', [KontrakController::class, 'hapusKontrak']);
 
-    Route::post('/kontrak/upload-revisi/{id}', [DokumenController::class, 'uploadRevisi']);
-    Route::post('/kontrak/sign/{id}', [DokumenController::class, 'signDocument']);
+    Route::post('/kontrak/upload-revisi/{id}', [KontrakController::class, 'uploadRevisi']);
+    Route::post('/kontrak/sign/{id}', [KontrakController::class, 'signDocument']);
 
     // Kontrak Non Aktif
     Route::get('/dataKontrakNonAktif', [KontrakController::class, 'kontrakNonAktif']);
@@ -78,11 +79,6 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
 
     Route::put('/laporan/{id}', [LaporanController::class, 'update']);
     Route::get('/pegawai', [PegawaiController::class, 'index']);
-
-    // Laporan 
-    Route::get('/user', function (Request $request) {
-        return $request->user();
-    });
 });
 
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->group(function () {

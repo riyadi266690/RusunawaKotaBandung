@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Lokasi::class);
     }
+
+    public function kontrak()
+    {
+        return $this->hasOne(Kontrak::class);
+    }
 }

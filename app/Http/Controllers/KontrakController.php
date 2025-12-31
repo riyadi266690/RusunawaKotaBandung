@@ -22,6 +22,8 @@ use App\Http\Resources\Kontrak\KontrakResource;
 use App\Http\Requests\Dokumen\SignDocumentRequest;
 use App\Http\Requests\Dokumen\UploadRevisiRequest;
 
+use function PHPUnit\Framework\isFalse;
+
 class KontrakController extends Controller
 {
     public function kontrakAktif(Request $request)
@@ -337,6 +339,13 @@ class KontrakController extends Controller
     public function putusKontrak(UpdateKontrak $request, Kontrak $kontrak)
     {
         $kontrak->update(['status_kontrak' => 0, 'tgl_keluar' => $request->tgl_keluar]);
+        return response()->json(['success' => true]);
+    }
+
+    function hapusKontrak(Kontrak $kontrak)
+    {
+        User::where('email', $kontrak->email)->delete();
+        $kontrak->delete();
         return response()->json(['success' => true]);
     }
 }
