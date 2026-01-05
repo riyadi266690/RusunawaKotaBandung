@@ -49,10 +49,10 @@ class UnitController extends Controller
                 'unit.tipe_unit',
                 'unit.status_jual',
                 'gedung.nama_gedung as gedung_nama',
-                'lokasi.nama_lokasi as lokasi_nama' 
+                'lokasi.nama_lokasi as lokasi_nama'
             )
             ->join('gedung', 'unit.gedung_id', '=', 'gedung.id')
-            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id') 
+            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
             ->orderBy('unit.id', 'desc');
         return DataTables::of($query)
             ->addColumn('gedung', function ($unit) {
@@ -125,7 +125,6 @@ class UnitController extends Controller
                 'required',
                 'string',
                 'max:255',
-                // Aturan unik kompleks: nomor harus unik untuk kombinasi gedung_id, lantai, dan tipe_unit, kecuali untuk unit ini sendiri
                 \Illuminate\Validation\Rule::unique('unit')->where(function ($query) use ($request) {
                     return $query->where('gedung_id', $request->gedung_id)
                         ->where('lantai', $request->lantai)

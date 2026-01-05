@@ -79,6 +79,12 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
 
     Route::put('/laporan/{id}', [LaporanController::class, 'update']);
     Route::get('/pegawai', [PegawaiController::class, 'index']);
+
+    // Pegawai
+    Route::get('/dataPegawaiAll', [PegawaiController::class, 'allDataPegawai']);
+    Route::post('/storePegawai', [PegawaiController::class, 'storePegawai']);
+    Route::put('/updatePegawai/{pegawai}', [PegawaiController::class, 'editPegawai']);
+    Route::delete('/deletePegawai/{pegawai}', [PegawaiController::class, 'destroyPegawai']);
 });
 
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->group(function () {
