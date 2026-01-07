@@ -23,7 +23,7 @@ class updatePegawai extends FormRequest
     {
         return [
             'nama_pegawai' => 'required|string|max:255',
-            'no_hp' => 'nullable|string|max:255|unique:pegawai,no_hp',
+            'no_hp' => 'nullable|string|max:255',
             'posisi' => 'nullable|string|max:255',
         ];
     }

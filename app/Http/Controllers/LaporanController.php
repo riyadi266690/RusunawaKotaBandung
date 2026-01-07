@@ -45,8 +45,6 @@ class LaporanController extends Controller
             $fotoPath = $request->file('foto')->store('laporan', 'public');
         }
 
-        // Handle case jika Admin iseng mau input laporan manual (opsional)
-        // Tapi utamanya ini buat Penghuni
         $unitId = $request->user()->unit_id; 
 
         $laporan = Laporan::create([
@@ -65,16 +63,13 @@ class LaporanController extends Controller
         ], 201);
     }
 
-    // 3. UPDATE LAPORAN (KHUSUS ADMIN MENUGASKAN PEGAWAI)
     public function update(Request $request, $id)
     {
-        // Cari Laporan
         $laporan = Laporan::find($id);
         if (!$laporan) {
             return response()->json(['message' => 'Laporan tidak ditemukan'], 404);
         }
 
-        // Validasi Input Admin
         $validator = Validator::make($request->all(), [
             'status' => 'required|in:Terkirim,Diproses,Dikerjakan,Selesai',
             'pegawai_id' => 'nullable|exists:pegawai,id', // Pastikan ID pegawai valid
@@ -84,11 +79,11 @@ class LaporanController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        // Update Data
         $laporan->update([
             'status' => $request->status,
             'pegawai_id' => $request->pegawai_id
         ]);
+
 
         return response()->json([
             'success' => true,

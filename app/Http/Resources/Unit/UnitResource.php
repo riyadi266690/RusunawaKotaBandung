@@ -4,6 +4,7 @@ namespace App\Http\Resources\Unit;
 
 use Illuminate\Http\Request;
 use App\Http\Resources\Gedung\GedungResource;
+use App\Http\Resources\Lokasi\LokasiResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UnitResource extends JsonResource

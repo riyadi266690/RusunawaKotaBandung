@@ -97,4 +97,7 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->grou
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin,Penghuni'])->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index']);
     Route::post('/laporan', [LaporanController::class, 'store']);
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 });

@@ -7,7 +7,7 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $lokasi_id
+     * @property mixed $lokasi_id
      * @property string $tipe_gedung
      * @property string $nama_gedung
      * @property int $id
@@ -318,28 +318,28 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $deleted_at
-     * @property int|null $deleted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
-     * @property int|null $penghuni_4
-     * @property int|null $penghuni_3
-     * @property int|null $penghuni_2
-     * @property int $penghuni_1
+     * @property mixed $deleted_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
+     * @property mixed $penghuni_4
+     * @property mixed $penghuni_3
+     * @property mixed $penghuni_2
+     * @property mixed $penghuni_1
      * @property float|null $luas_usaha
      * @property string|null $jenis_usaha
-     * @property int|null $harga_air
-     * @property int|null $harga_sewa
+     * @property mixed $harga_air
+     * @property mixed $harga_sewa
      * @property string|null $dok_kontrak
-     * @property int $status_ttd
+     * @property mixed $status_ttd
      * @property string $nama_pihak1
-     * @property int $status_kontrak
-     * @property int|null $masa_kontrak
+     * @property mixed $status_kontrak
+     * @property mixed $masa_kontrak
      * @property string|null $tgl_keluar
      * @property string $tgl_akhir
      * @property string $tgl_awal
-     * @property int $tipe_kontrak
+     * @property mixed $tipe_kontrak
      * @property string $no_kontrak
-     * @property int $unit_id
+     * @property mixed $unit_id
      * @property int $id
      * @property-read \App\Models\User $user
      * @property-read \App\Models\Unit $unit
@@ -673,13 +673,13 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $pegawai_id
+     * @property mixed $pegawai_id
      * @property mixed $status
      * @property string|null $foto
      * @property string $deskripsi
      * @property string $judul
-     * @property int $unit_id
-     * @property int $user_id
+     * @property mixed $unit_id
+     * @property mixed $user_id
      * @property int $id
      * @property-read \App\Models\User $user
      * @property-read \App\Models\Unit $unit
@@ -991,7 +991,7 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int $id_user
+     * @property mixed $id_user
      * @property string $alamat_lokasi
      * @property string $kepala_lokasi
      * @property string $nama_lokasi
@@ -1611,12 +1611,12 @@ namespace App\Models {
      *
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
-     * @property int|null $updated_by
+     * @property mixed $updated_by
      * @property string|null $ket_wawancara
      * @property string|null $tgl_final
      * @property string|null $tgl_wawancara
      * @property string $tgl_daftar
-     * @property int $status_daftar
+     * @property mixed $status_daftar
      * @property string $suket
      * @property string|null $telp_pendaftar_hash
      * @property string $telp_pendaftar
@@ -1935,14 +1935,14 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $deleted_at
-     * @property int|null $deleted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $deleted_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string|null $alamat
      * @property string|null $pekerjaan
-     * @property int $agama
-     * @property int $status_kawin
-     * @property int $jenis_kelamin
+     * @property mixed $agama
+     * @property mixed $status_kawin
+     * @property mixed $jenis_kelamin
      * @property string|null $no_tlp_hmac
      * @property string $no_tlp
      * @property string|null $tempat_lahir
@@ -1953,7 +1953,7 @@ namespace App\Models {
      * @property string $nama
      * @property string|null $nik_hmac
      * @property string $nik
-     * @property int|null $user_id
+     * @property mixed $user_id
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kontrak> $kontrakAsPenghuni1
      * @property-read int|null $kontrakAsPenghuni1_count
@@ -2287,9 +2287,9 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $deleted_at
-     * @property int|null $deleted_by
-     * @property int|null $updated_by
-     * @property int|null $created_by
+     * @property mixed $deleted_by
+     * @property mixed $updated_by
+     * @property mixed $created_by
      * @property string $nama_role
      * @property int $id
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\User> $User
@@ -2603,7 +2603,7 @@ namespace App\Models {
      * @property string $tipe_unit
      * @property string $lantai
      * @property string $nomor
-     * @property int $gedung_id
+     * @property mixed $gedung_id
      * @property int $id
      * @property-read \App\Models\Gedung $Gedung
      * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Kontrak> $kontrak
@@ -2914,8 +2914,8 @@ namespace App\Models {
      * @property \Illuminate\Support\Carbon|null $updated_at
      * @property \Illuminate\Support\Carbon|null $created_at
      * @property string|null $remember_token
-     * @property int|null $role_id
-     * @property int|null $unit_id
+     * @property mixed $role_id
+     * @property mixed $unit_id
      * @property string $password
      * @property \Illuminate\Support\Carbon|null $email_verified_at
      * @property string $email
