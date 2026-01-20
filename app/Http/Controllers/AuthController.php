@@ -29,26 +29,24 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-        $errors = $validator->errors()->all();
-        $errorString = implode('<br>', $errors);
-        return back()->with('gagal', $errorString)->withInput();
+            $errors = $validator->errors()->all();
+            $errorString = implode('<br>', $errors);
+            return back()->with('gagal', $errorString)->withInput();
         }
         $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {   
+        if (Auth::attempt($credentials)) {
             $user = Auth::user();
-        // Hapus semua session user ini (selain session yang sedang login)
-            DB::table('sessions')
-                ->where('user_id', $user->id)
-                ->where('id', '!=', Session::getId())
-                ->delete();
+            // Hapus semua session user ini (selain session yang sedang login)
+            // DB::table('sessions')
+            //     ->where('user_id', $user->id)
+            //     ->where('id', '!=', Session::getId())
+            //     ->delete();
 
             $request->session()->regenerate();
             return redirect()->route('dashboard.index')->with('sukses', 'Login berhasil.');
         } else {
             return back()->with('gagal', 'Email atau password salah.')->withInput();
         }
-        
-        
     }
     public function logout(Request $request)
     {
@@ -80,7 +78,7 @@ class AuthController extends Controller
         }
         $user = Auth::user();
         if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('gagal', 'Password saat ini salah.')->withInput(); 
+            return back()->with('gagal', 'Password saat ini salah.')->withInput();
         }
 
         $user->password = Hash::make($request->new_password);
