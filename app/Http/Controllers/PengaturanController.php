@@ -76,19 +76,20 @@ class PengaturanController extends Controller
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi',
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
-            'mulai_dari' => 'required|numeric',
-            'link_formulir' => 'required|file|mimes:pdf,doc,docx|max:2048',
+            'mulai_dari' => 'required|string|max:255',
+            'link_formulir' => 'nullable|string|max:255',
+            'format_kontrak' => 'nullable|file|mimes:doc,docx|max:2048',
         ], [
             'nama_lokasi.required' => 'Nama lokasi harus diisi.',
             'nama_lokasi.unique' => 'Nama lokasi sudah ada.',
             'kepala_lokasi.required' => 'Penanggung jawab harus diisi.',
             'alamat_lokasi.required' => 'Alamat harus diisi.',
             'mulai_dari.required' => 'Mulai dari harus diisi.',
-            'mulai_dari.numeric' => 'Mulai dari harus berupa angka.',
-            'link_formulir.required' => 'Link formulir harus diisi.',
-            'link_formulir.file' => 'Link formulir harus berupa file.',
-            'link_formulir.mimes' => 'Link formulir harus berupa file PDF, DOC, atau DOCX.',
-            'link_formulir.max' => 'Link formulir tidak boleh lebih besar dari 2MB.',
+            'mulai_dari.string' => 'Mulai dari harus berupa teks.',
+            'link_formulir.string' => 'Link formulir harus berupa teks.',
+            'format_kontrak.file' => 'Link formulir harus berupa file.',
+            'format_kontrak.mimes' => 'Link formulir harus berupa file PDF, DOC, atau DOCX.',
+            'format_kontrak.max' => 'Link formulir tidak boleh lebih besar dari 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -101,15 +102,16 @@ class PengaturanController extends Controller
         try {
             DB::beginTransaction();
             $formulirPath = null;
-            if ($request->hasFile('link_formulir')) {
-                $formulirPath = $request->file('link_formulir')->store('formulir', 'public');
+            if ($request->hasFile('format_kontrak')) {
+                $formulirPath = $request->file('format_kontrak')->store('format_kontrak', 'public');
             }
             $lokasi = Lokasi::create([
                 'nama_lokasi' => $request->nama_lokasi,
                 'kepala_lokasi' => $request->kepala_lokasi,
                 'alamat_lokasi' => $request->alamat_lokasi,
                 'mulai_dari' => $request->mulai_dari,
-                'link_formulir' => $formulirPath
+                'link_formulir' => $request->link_formulir,
+                'format_kontrak' => $formulirPath
             ]);
             $userIds = [Auth::id()];
             $lokasi->users()->attach($userIds);
@@ -151,18 +153,20 @@ class PengaturanController extends Controller
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,' . $lokasi->id,
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
-            'mulai_dari' => 'required|numeric',
-            'link_formulir' => 'file|mimes:pdf,doc,docx|max:2048',
+            'mulai_dari' => 'required|string|max:255',
+            'link_formulir' => 'nullable|string|max:255',
+            'format_kontrak' => 'nullable|file|mimes:doc,docx|max:2048',
         ], [
             'nama_lokasi.required' => 'Nama lokasi harus diisi.',
             'nama_lokasi.unique' => 'Nama lokasi sudah ada.',
             'kepala_lokasi.required' => 'Penanggung jawab harus diisi.',
             'alamat_lokasi.required' => 'Alamat harus diisi.',
             'mulai_dari.required' => 'Mulai dari harus diisi.',
-            'mulai_dari.numeric' => 'Mulai dari harus berupa angka.',
-            'link_formulir.file' => 'Link formulir harus berupa file.',
-            'link_formulir.mimes' => 'Link formulir harus berupa file PDF, DOC, atau DOCX.',
-            'link_formulir.max' => 'Link formulir tidak boleh lebih besar dari 2MB.',
+            'mulai_dari.string' => 'Mulai dari harus berupa teks.',
+            'link_formulir.string' => 'Link formulir harus berupa teks.',
+            'format_kontrak.file' => 'Link formulir harus berupa file.',
+            'format_kontrak.mimes' => 'Link formulir harus berupa file PDF, DOC, atau DOCX.',
+            'format_kontrak.max' => 'Link formulir tidak boleh lebih besar dari 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -174,8 +178,8 @@ class PengaturanController extends Controller
 
         try {
             $formulirPath = null;
-            if ($request->hasFile('link_formulir')) {
-                $formulirPath = $request->file('link_formulir')->store('formulir', 'public');
+            if ($request->hasFile('format_kontrak')) {
+                $formulirPath = $request->file('format_kontrak')->store('format_kontrak', 'public');
             }
             DB::beginTransaction();
             $lokasi->update([
@@ -183,7 +187,8 @@ class PengaturanController extends Controller
                 'kepala_lokasi' => $request->kepala_lokasi,
                 'alamat_lokasi' => $request->alamat_lokasi,
                 'mulai_dari' => $request->mulai_dari,
-                'link_formulir' => $formulirPath
+                'link_formulir' => $request->link_formulir,
+                'format_kontrak' => $formulirPath
             ]);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data lokasi berhasil diperbarui.']);
