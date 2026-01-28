@@ -114,10 +114,6 @@
     </div> <!-- row -->
 
 
-
-
-
-
     <!-- Modal Tambah/Edit Lokasi -->
     <div class="modal fade" id="addLokasiModal" tabindex="-1" aria-labelledby="addLokasiModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -145,14 +141,18 @@
                         </div>
                         <div class="mb-3">
                             <label for="mulai_dari" class="form-label">Harga Mulai Dari</label>
-                            <input type="number" class="form-control" id="mulai_dari" name="mulai_dari" required>
+                            <input type="string" class="form-control" id="mulai_dari" name="mulai_dari" required>
                         </div>
                         <div class="mb-3">
-                            <label for="link_formulir" class="form-label">Formulir Pendaftaran</label>
-                            <input type="file" class="form-control" id="link_formulir" name="link_formulir"
-                                accept=".pdf,.doc,.docx" required>
+                            <label for="link_formulir" class="form-label">Link Formulir</label>
+                            <input type="string" class="form-control" id="link_formulir" name="link_formulir">
+                        </div>
+                        <div class="mb-3">
+                            <label for="format_kontrak" class="form-label">Format Kontrak</label>
+                            <input type="file" class="form-control" id="format_kontrak" name="format_kontrak"
+                                accept=".pdf,.doc,.docx">
                             <div class="form-text">
-                                Format: PDF, DOC, DOCX. Maksimal 2MB
+                                Format: DOC, DOCX. Maksimal 2MB
                             </div>
                             <div id="existingFileInfo" class="form-text text-primary"></div>
                         </div>
@@ -410,6 +410,7 @@
                 $('#alamat_lokasi').val('');
                 $('#mulai_dari').val('');
                 $('#link_formulir').val('');
+                $('#format_kontrak').val('');
                 $('#lokasiFormMethod').val('POST');
                 $('#addLokasiModalLabel').text('Tambah Data Lokasi');
                 $('#submitLokasiBtn').text('Simpan Data');
@@ -421,12 +422,13 @@
                 $('#kepala_lokasi').val(data.kepala_lokasi);
                 $('#alamat_lokasi').val(data.alamat_lokasi);
                 $('#mulai_dari').val(data.mulai_dari);
-                $('#link_formulir').val('');
+                $('#link_formulir').val(data.link_formulir);
+                $('#format_kontrak').val('');
 
-                if (data.link_formulir) {
+                if (data.format_kontrak) {
                     $('#existingFileInfo').html(`
             File saat ini: 
-            <a href="/storage/${data.link_formulir}" target="_blank">
+            <a href="/storage/${data.format_kontrak}" target="_blank">
                 Lihat Formulir
             </a>
         `);
