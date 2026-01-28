@@ -40,18 +40,18 @@ class PengaturanController extends Controller
             ->aksesUser()
             ->select('id', 'nama_lokasi', 'kepala_lokasi', 'alamat_lokasi')
             ->orderBy('id', 'asc');
-        
+
         return DataTables::of($query)
-            ->addColumn('lokasi', function($lokasi){
+            ->addColumn('lokasi', function ($lokasi) {
                 return $lokasi->nama_lokasi;
             })
-            ->addColumn('penanggung_jawab', function($lokasi){
+            ->addColumn('penanggung_jawab', function ($lokasi) {
                 return $lokasi->kepala_lokasi;
             })
-            ->addColumn('alamat', function($lokasi){
+            ->addColumn('alamat', function ($lokasi) {
                 return $lokasi->alamat_lokasi;
             })
-            ->addColumn('aksi', function($lokasi){
+            ->addColumn('aksi', function ($lokasi) {
                 return '<div class="btn-group">
                             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
                             <div class="dropdown-menu">                                                          
@@ -76,11 +76,19 @@ class PengaturanController extends Controller
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi',
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
+            'mulai_dari' => 'required|numeric',
+            'link_formulir' => 'required|file|mimes:pdf,doc,docx|max:2048',
         ], [
             'nama_lokasi.required' => 'Nama lokasi harus diisi.',
             'nama_lokasi.unique' => 'Nama lokasi sudah ada.',
             'kepala_lokasi.required' => 'Penanggung jawab harus diisi.',
             'alamat_lokasi.required' => 'Alamat harus diisi.',
+            'mulai_dari.required' => 'Mulai dari harus diisi.',
+            'mulai_dari.numeric' => 'Mulai dari harus berupa angka.',
+            'link_formulir.required' => 'Link formulir harus diisi.',
+            'link_formulir.file' => 'Link formulir harus berupa file.',
+            'link_formulir.mimes' => 'Link formulir harus berupa file PDF, DOC, atau DOCX.',
+            'link_formulir.max' => 'Link formulir tidak boleh lebih besar dari 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -92,7 +100,17 @@ class PengaturanController extends Controller
 
         try {
             DB::beginTransaction();
-            $lokasi = Lokasi::create($request->all());
+            $formulirPath = null;
+            if ($request->hasFile('link_formulir')) {
+                $formulirPath = $request->file('link_formulir')->store('formulir', 'public');
+            }
+            $lokasi = Lokasi::create([
+                'nama_lokasi' => $request->nama_lokasi,
+                'kepala_lokasi' => $request->kepala_lokasi,
+                'alamat_lokasi' => $request->alamat_lokasi,
+                'mulai_dari' => $request->mulai_dari,
+                'link_formulir' => $formulirPath
+            ]);
             $userIds = [Auth::id()];
             $lokasi->users()->attach($userIds);
             DB::commit();
@@ -133,11 +151,18 @@ class PengaturanController extends Controller
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,' . $lokasi->id,
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
+            'mulai_dari' => 'required|numeric',
+            'link_formulir' => 'file|mimes:pdf,doc,docx|max:2048',
         ], [
             'nama_lokasi.required' => 'Nama lokasi harus diisi.',
             'nama_lokasi.unique' => 'Nama lokasi sudah ada.',
             'kepala_lokasi.required' => 'Penanggung jawab harus diisi.',
             'alamat_lokasi.required' => 'Alamat harus diisi.',
+            'mulai_dari.required' => 'Mulai dari harus diisi.',
+            'mulai_dari.numeric' => 'Mulai dari harus berupa angka.',
+            'link_formulir.file' => 'Link formulir harus berupa file.',
+            'link_formulir.mimes' => 'Link formulir harus berupa file PDF, DOC, atau DOCX.',
+            'link_formulir.max' => 'Link formulir tidak boleh lebih besar dari 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -148,8 +173,18 @@ class PengaturanController extends Controller
         }
 
         try {
+            $formulirPath = null;
+            if ($request->hasFile('link_formulir')) {
+                $formulirPath = $request->file('link_formulir')->store('formulir', 'public');
+            }
             DB::beginTransaction();
-            $lokasi->update($request->all());
+            $lokasi->update([
+                'nama_lokasi' => $request->nama_lokasi,
+                'kepala_lokasi' => $request->kepala_lokasi,
+                'alamat_lokasi' => $request->alamat_lokasi,
+                'mulai_dari' => $request->mulai_dari,
+                'link_formulir' => $formulirPath
+            ]);
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data lokasi berhasil diperbarui.']);
         } catch (\Exception $e) {
@@ -188,13 +223,13 @@ class PengaturanController extends Controller
     {
         try {
             $lokasi = Lokasi::query()
-            // Terapkan scope AksesUser di sini!
-            // Hanya lokasi yang dimiliki oleh user yang login yang akan diambil
-            ->aksesUser() 
-            
-            ->select('id', 'nama_lokasi')
-            ->get();
-            
+                // Terapkan scope AksesUser di sini!
+                // Hanya lokasi yang dimiliki oleh user yang login yang akan diambil
+                ->aksesUser()
+
+                ->select('id', 'nama_lokasi')
+                ->get();
+
             return response()->json(['success' => true, 'data' => $lokasi]);
         } catch (\Exception $e) {
             Log::error('Error fetching lokasi options: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -217,12 +252,12 @@ class PengaturanController extends Controller
             ->select('gedung.id', 'gedung.nama_gedung', 'gedung.tipe_gedung', 'lokasi.nama_lokasi as lokasi')
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
             ->orderBy('gedung.id', 'asc');
-        
+
         return DataTables::of($query)
-            ->addColumn('lokasi', function($gedung){
+            ->addColumn('lokasi', function ($gedung) {
                 return $gedung->lokasi; // Sudah di-join dan di-alias
             })
-            ->addColumn('aksi', function($gedung){
+            ->addColumn('aksi', function ($gedung) {
                 return '<div class="btn-group">
                             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
                             <div class="dropdown-menu">                                                          
@@ -360,12 +395,12 @@ class PengaturanController extends Controller
     {
         try {
             $gedung = Gedung::query()
-                            ->aksesUser()
-                            ->select('gedung.id', 'gedung.nama_gedung', 'lokasi.nama_lokasi as lokasi_nama')
-                            ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
-                            ->get();
+                ->aksesUser()
+                ->select('gedung.id', 'gedung.nama_gedung', 'lokasi.nama_lokasi as lokasi_nama')
+                ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id')
+                ->get();
             // Map data untuk format yang lebih mudah di frontend
-            $formattedGedung = $gedung->map(function($item) {
+            $formattedGedung = $gedung->map(function ($item) {
                 return [
                     'id' => $item->id,
                     'nama_gedung' => $item->nama_gedung,
@@ -391,11 +426,11 @@ class PengaturanController extends Controller
         $query = Unit::query()
             ->aksesUser()
             ->select(
-                'unit.id', 
-                'unit.nomor', 
-                'unit.lantai', 
-                'unit.tipe_unit', 
-                'unit.status_jual', 
+                'unit.id',
+                'unit.nomor',
+                'unit.lantai',
+                'unit.tipe_unit',
+                'unit.status_jual',
                 'gedung.nama_gedung as gedung_nama',
                 'lokasi.nama_lokasi as lokasi_nama' // Tambahkan ini
             )
@@ -403,13 +438,13 @@ class PengaturanController extends Controller
             ->join('lokasi', 'gedung.lokasi_id', '=', 'lokasi.id') // Tambahkan join ke lokasi
             ->orderBy('unit.id', 'desc');
         return DataTables::of($query)
-            ->addColumn('gedung', function($unit){
-                return $unit->lokasi_nama . ' ' . $unit->gedung_nama; 
+            ->addColumn('gedung', function ($unit) {
+                return $unit->lokasi_nama . ' ' . $unit->gedung_nama;
             })
-            ->addColumn('status_jual', function($unit){
+            ->addColumn('status_jual', function ($unit) {
                 return $unit->status_jual == '1' ? 'Tersedia' : 'Dalam Perbaikan';
             })
-            ->addColumn('aksi', function($unit){
+            ->addColumn('aksi', function ($unit) {
                 return '<div class="btn-group">
                             <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
                             <div class="dropdown-menu">                                                          
@@ -428,7 +463,7 @@ class PengaturanController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-   public function storeUnit(Request $request)
+    public function storeUnit(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'gedung_id' => 'required|exists:gedung,id',
@@ -439,8 +474,8 @@ class PengaturanController extends Controller
                 // Aturan unik kompleks: nomor harus unik untuk kombinasi gedung_id, lantai, dan tipe_unit
                 \Illuminate\Validation\Rule::unique('unit')->where(function ($query) use ($request) {
                     return $query->where('gedung_id', $request->gedung_id)
-                                 ->where('lantai', $request->lantai)
-                                 ->where('tipe_unit', $request->tipe_unit);
+                        ->where('lantai', $request->lantai)
+                        ->where('tipe_unit', $request->tipe_unit);
                 })
             ],
             'lantai' => 'required|integer|min:1|max:5',
@@ -514,8 +549,8 @@ class PengaturanController extends Controller
                 // Aturan unik kompleks: nomor harus unik untuk kombinasi gedung_id, lantai, dan tipe_unit, kecuali untuk unit ini sendiri
                 \Illuminate\Validation\Rule::unique('unit')->where(function ($query) use ($request) {
                     return $query->where('gedung_id', $request->gedung_id)
-                                 ->where('lantai', $request->lantai)
-                                 ->where('tipe_unit', $request->tipe_unit);
+                        ->where('lantai', $request->lantai)
+                        ->where('tipe_unit', $request->tipe_unit);
                 })->ignore($unit->id)
             ],
             'lantai' => 'required|integer|min:1|max:5',
