@@ -25,4 +25,12 @@ class UpdateKontrak extends FormRequest
             'tgl_keluar' => 'required|date',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute harus diisi.',
+            'date' => ':attribute harus berupa tanggal.',
+        ];
+    }
 }

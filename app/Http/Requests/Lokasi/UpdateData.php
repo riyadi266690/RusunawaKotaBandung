@@ -27,4 +27,14 @@ class UpdateData extends FormRequest
             'alamat_lokasi' => 'required|string|max:255',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa string.',
+            'max' => ':attribute maksimal 255 karakter.',
+            'unique' => ':attribute sudah terdaftar.',
+        ];
+    }
 }

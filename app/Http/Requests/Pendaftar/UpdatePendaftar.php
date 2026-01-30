@@ -31,10 +31,9 @@ class UpdatePendaftar extends FormRequest
     public function messages(): array
     {
         return [
-            'tgl_wawancara.required' => 'Tanggal wawancara harus diisi.',
-            'tgl_wawancara.date' => 'Format tanggal tidak valid.',
-            'tgl_final.date' => 'Format tanggal tidak valid.',
-            'ket_wawancara.string' => 'Catatan wawancara harus berupa teks.',
+            'required' => ':attribute harus diisi.',
+            'date' => ':attribute harus berupa tanggal.',
+            'string' => ':attribute harus berupa teks.',
         ];
     }
 }

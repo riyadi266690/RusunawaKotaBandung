@@ -31,15 +31,12 @@ class StorePendaftar extends FormRequest
     public function messages(): array
     {
         return [
-            'nama.required' => 'Nama harus diisi.',
-            'nama.string' => 'Nama harus berupa string.',
-            'nama.max' => 'Nama maksimal 255 karakter.',
-            'telp_pendaftar.required' => 'Nomor Telepon harus diisi.',
-            'telp_pendaftar.numeric' => 'Nomor Telepon harus berupa angka.',
-            'suket.required' => 'Suket harus diisi.',
-            'suket.file' => 'Suket harus berupa file.',
-            'suket.mimes' => 'Suket harus berupa file PDF.',
-            'suket.max' => 'Suket maksimal 2MB.',
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'max' => ':attribute maksimal :max karakter.',
+            'numeric' => ':attribute harus berupa angka.',
+            'file' => ':attribute harus berupa file.',
+            'mimes' => ':attribute harus berupa file PDF.',
         ];
     }
 }

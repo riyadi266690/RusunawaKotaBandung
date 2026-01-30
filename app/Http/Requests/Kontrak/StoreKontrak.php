@@ -57,4 +57,26 @@ class StoreKontrak extends FormRequest
             'penghuni_4' => 'nullable|exists:penghuni,id|different:penghuni_1|different:penghuni_2|different:penghuni_3',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute harus diisi.',
+            'exists' => ':attribute tidak ditemukan.',
+            'integer' => ':attribute harus berupa angka.',
+            'string' => ':attribute harus berupa teks.',
+            'date' => ':attribute harus berupa tanggal.',
+            'after_or_equal' => ':attribute harus setelah tanggal awal.',
+            'unique' => ':attribute sudah terdaftar.',
+            'in' => ':attribute tidak valid.',
+            'numeric' => ':attribute harus berupa angka.',
+            'different' => ':attribute tidak boleh sama dengan :other.',
+            'max' => ':attribute maksimal :max karakter.',
+
+            'penghuni_1.different' => 'Penghuni 1 dan penghuni 2 tidak boleh sama.',
+            'penghuni_2.different' => 'Penghuni 1 dan penghuni 2 tidak boleh sama.',
+            'penghuni_3.different' => 'Penghuni 1 dan penghuni 3 tidak boleh sama.',
+            'penghuni_4.different' => 'Penghuni 1 dan penghuni 4 tidak boleh sama.',
+        ];
+    }
 }

@@ -39,17 +39,16 @@ class StoreRequestPenghuni extends FormRequest
     public function messages(): array
     {
         return [
-            'nik.required'           => 'NIK harus diisi.',
-            'nama.required'          => 'Nama harus diisi.',
-            'email.required'         => 'Email harus diisi.',
-            'email.email'            => 'Format email tidak valid.',
-            'tgl_lahir.required'     => 'Tanggal lahir harus diisi.',
-            'tempat_lahir.required'  => 'Tempat lahir harus diisi.',
-            'no_tlp.required'        => 'Nomor telepon harus diisi.',
-            'no_tlp.numeric'         => 'Nomor telepon harus angka.',
-            'jenis_kelamin.required' => 'Jenis kelamin harus dipilih.',
-            'status_kawin.required'  => 'Status kawin harus dipilih.',
-            'agama.required'         => 'Agama harus dipilih.',
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'max' => ':attribute maksimal :max karakter.',
+            'numeric' => ':attribute harus berupa angka.',
+            'date' => ':attribute harus berupa tanggal.',
+            'email' => ':attribute harus berupa email.',
+            'in' => ':attribute tidak valid.',
+            'unique' => ':attribute sudah terdaftar.',
+            'exists' => ':attribute tidak ditemukan.',
+            'integer' => ':attribute harus berupa angka.',
         ];
     }
 }

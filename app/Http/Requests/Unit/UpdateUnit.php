@@ -39,4 +39,18 @@ class UpdateUnit extends FormRequest
             'status_jual' => 'required|string|in:0,1',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa string.',
+            'max' => ':attribute maksimal 255 karakter.',
+            'unique' => ':attribute sudah terdaftar.',
+            'min' => ':attribute minimal :min.',
+            'integer' => ':attribute harus berupa angka.',
+            'exists' => ':attribute tidak ditemukan.',
+            'in' => ':attribute tidak valid.',
+        ];
+    }
 }

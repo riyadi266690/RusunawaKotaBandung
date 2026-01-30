@@ -6,12 +6,23 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class SignDocumentRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     public function rules(): array
     {
         return [
-            'signature_image' => 'required|string', // Base64 string
+            'signature_image' => 'required|string',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa teks.',
         ];
     }
 }

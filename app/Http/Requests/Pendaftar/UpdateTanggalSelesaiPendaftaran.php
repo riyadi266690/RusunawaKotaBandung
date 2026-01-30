@@ -40,10 +40,10 @@ class UpdateTanggalSelesaiPendaftaran extends FormRequest
     public function messages(): array
     {
         return [
-            'tgl_final.required' => 'Tanggal selesai harus diisi.',
-            'tgl_final.date' => 'Format tanggal tidak valid.',
-            'tgl_final.after_or_equal' => 'Tanggal selesai tidak boleh lebih awal dari tanggal wawancara.',
-            'ket_wawancara.string' => 'Catatan wawancara harus berupa teks.',
+            'required' => ':attribute harus diisi.',
+            'date' => ':attribute harus berupa tanggal.',
+            'after_or_equal' => ':attribute harus setelah tanggal wawancara.',
+            'string' => ':attribute harus berupa teks.',
         ];
     }
 }

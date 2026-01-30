@@ -32,21 +32,15 @@ class StoreUser extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required' => 'Nama harus diisi.',
-            'namee.string' => 'Nama harus berupa string.',
-            'name.max' => 'Nama maksimal 255 karakter.',
-            'email.required' => 'Email harus diisi.',
-            'email.string' => 'Email harus berupa string.',
-            'email.email' => 'Email tidak valid.',
-            'email.max' => 'Email maksimal 255 karakter.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'password.required' => 'Password harus diisi.',
-            'password.string' => 'Password harus berupa string.',
-            'password.min' => 'Password minimal 6 karakter.',
-            'password.confirmed' => 'Password tidak cocok.',
-            'role_id.required' => 'Role wajib dipilih.',
-            'role_id.integer' => 'Format role tidak valid.',
-            'role_id.exists' => 'Role yang dipilih tidak tersedia di database.',
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'max' => ':attribute maksimal :max karakter.',
+            'min' => ':attribute minimal :min karakter.',
+            'email' => ':attribute harus berupa email.',
+            'unique' => ':attribute sudah terdaftar.',
+            'confirmed' => ':attribute harus sama dengan password.',
+            'integer' => ':attribute harus berupa angka.',
+            'exists' => ':attribute tidak ditemukan.',
         ];
     }
 }

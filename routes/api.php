@@ -26,78 +26,73 @@ Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin'])
     Route::get('/dashboard-data', [DashboardController::class, 'index']);
 
     // Pendaftar
-    Route::get('/dataPendaftar', [PendaftaranController::class, 'allDataPendaftaran']);
-    Route::put('/updateTanggalWawancara/{id}', [PendaftaranController::class, 'updateTanggalWawancara']);
-    Route::put('/updateTanggalSelesai/{id}', [PendaftaranController::class, 'updateTanggalSelesai']);
-    Route::delete('/deletePendaftar/{id}', [PendaftaranController::class, 'destroy']);
+    Route::get('/pendaftaran', [PendaftaranController::class, 'allDataPendaftaran']);
+    Route::put('/pendaftaran/tanggalWawancara/{id}', [PendaftaranController::class, 'updateTanggalWawancara']);
+    Route::put('/pendaftaran/tanggalSelesai/{id}', [PendaftaranController::class, 'updateTanggalSelesai']);
+    Route::delete('/pendaftaran/{id}', [PendaftaranController::class, 'destroy']);
 
     // Penghuni
-    Route::get('/dataPenghuniAll', [PenghuniController::class, 'allDataPenghuni']);
-    Route::get('/dataPenghuni', [PenghuniController::class, 'ajax_DTPenghuni']);
-    Route::post('/storePenghuni', [PenghuniController::class, 'store']);
-    Route::put('/updatePenghuni/{id}', [PenghuniController::class, 'update']);
-    Route::delete('/deletePenghuni/{id}', [PenghuniController::class, 'destroy']);
+    Route::get('/penghuni', [PenghuniController::class, 'allDataPenghuni']);
+    Route::post('/penghuni', [PenghuniController::class, 'store']);
+    Route::put('/penghuni/{id}', [PenghuniController::class, 'update']);
+    Route::delete('/penghuni/{id}', [PenghuniController::class, 'destroy']);
 
     // Kontrak Aktif
-    Route::get('/dataKontrak', [KontrakController::class, 'kontrakAktif']);
-    Route::get('/dataUnit', [KontrakController::class, 'getUnitOptions']);
-    Route::get('/getUnitDetails/{id}', [KontrakController::class, 'getUnitDetails']);
-    Route::get('/getPenghuniOption', [KontrakController::class, 'getPenghuniOptions']);
-    Route::post('/storeKontrak', [KontrakController::class, 'store']);
-    Route::put('/putusKontrak/{kontrak}', [KontrakController::class, 'putusKontrak']);
-    Route::delete('/hapusKontrak/{kontrak}', [KontrakController::class, 'hapusKontrak']);
+    Route::get('/kontrak/aktif', [KontrakController::class, 'kontrakAktif']);
 
-    Route::post('/kontrak/upload-revisi/{id}', [KontrakController::class, 'uploadRevisi']);
+    Route::get('/dataUnit', [KontrakController::class, 'getUnitOptions']);
+    Route::get('/unitDetails/{id}', [KontrakController::class, 'getUnitDetails']);
+    Route::get('/penghuniOptions', [KontrakController::class, 'getPenghuniOptions']);
+
+    Route::post('/kontrak', [KontrakController::class, 'store']);
+    Route::put('/kontrak/{kontrak}', [KontrakController::class, 'putusKontrak']);
+    Route::delete('/kontrak/{kontrak}', [KontrakController::class, 'hapusKontrak']);
+
+    Route::post('/kontrak/uploadRevisi/{id}', [KontrakController::class, 'uploadRevisi']);
     Route::post('/kontrak/sign/{id}', [KontrakController::class, 'signDocument']);
 
     // Kontrak Non Aktif
-    Route::get('/dataKontrakNonAktif', [KontrakController::class, 'kontrakNonAktif']);
-    Route::post('/dataKontrakNonAktif/{data}', [KontrakController::class, 'ajax_DTKontrakNonAktif']);
-    Route::post('/storeKontrak', [KontrakController::class, 'store']);
+    Route::get('/kontrak/nonAktif', [KontrakController::class, 'kontrakNonAktif']);
 
     // Pengaturan Lokasi
-    Route::get('/dataLokasiAll', [LokasiController::class, 'allDataLokasi']);
-    Route::post('/storeLokasi', [LokasiController::class, 'storeLokasi']);
-    Route::post('/dataLokasi/{request}', [LokasiController::class, 'ajax_DTLokasi']);
-    Route::put('/updateLokasi/{lokasi}', [LokasiController::class, 'updateLokasi']);
-    Route::delete('/deleteLokasi/{lokasi}', [LokasiController::class, 'destroyLokasi']);
-    Route::get('/getDataLokasi', [LokasiController::class, 'getLokasiOptions']);
+    Route::get('/lokasi', [LokasiController::class, 'allDataLokasi']);
+    Route::post('/lokasi', [LokasiController::class, 'storeLokasi']);
+    Route::put('/lokasi/{lokasi}', [LokasiController::class, 'updateLokasi']);
+    Route::delete('/lokasi/{lokasi}', [LokasiController::class, 'destroyLokasi']);
 
     // Pengaturan Gedung
-    Route::get('/dataGedungAll', [GedungController::class, 'allDataGedung']);
-    Route::post('/storeGedung', [GedungController::class, 'storeGedung']);
-    Route::post('/dataGedung/{request}', [GedungController::class, 'ajax_DTGedung']);
-    Route::put('/updateGedung/{gedung}', [GedungController::class, 'updateGedung']);
-    Route::delete('/deleteGedung/{gedung}', [GedungController::class, 'destroyGedung']);
+    Route::get('/gedung', [GedungController::class, 'allDataGedung']);
+    Route::post('/gedung', [GedungController::class, 'storeGedung']);
+    Route::put('/gedung/{gedung}', [GedungController::class, 'updateGedung']);
+    Route::delete('/gedung/{gedung}', [GedungController::class, 'destroyGedung']);
 
     // Pengaturan Unit
-    Route::get('/dataUnitAll', [UnitController::class, 'allDataUnit']);
-    Route::get('/dataUnit', [UnitController::class, 'ajax_DTUnit']);
-    Route::post('/storeUnit', [UnitController::class, 'storeUnit']);
-    Route::put('/updateUnit/{unit}', [UnitController::class, 'updateUnit']);
-    Route::delete('/deleteUnit/{unit}', [UnitController::class, 'destroyUnit']);
+    Route::get('/unit', [UnitController::class, 'ajax_DTUnit']);
+    Route::post('/unit', [UnitController::class, 'storeUnit']);
+    Route::put('/unit/{unit}', [UnitController::class, 'updateUnit']);
+    Route::delete('/unit/{unit}', [UnitController::class, 'destroyUnit']);
 
     Route::put('/laporan/{id}', [LaporanController::class, 'update']);
     Route::get('/pegawai', [PegawaiController::class, 'index']);
 
     // Pegawai
-    Route::get('/dataPegawaiAll', [PegawaiController::class, 'allDataPegawai']);
-    Route::post('/storePegawai', [PegawaiController::class, 'storePegawai']);
-    Route::put('/updatePegawai/{pegawai}', [PegawaiController::class, 'editPegawai']);
-    Route::delete('/deletePegawai/{pegawai}', [PegawaiController::class, 'destroyPegawai']);
+    Route::get('/pegawai', [PegawaiController::class, 'allDataPegawai']);
+    Route::post('/pegawai', [PegawaiController::class, 'storePegawai']);
+    Route::put('/pegawai/{pegawai}', [PegawaiController::class, 'editPegawai']);
+    Route::delete('/pegawai/{pegawai}', [PegawaiController::class, 'destroyPegawai']);
 });
 
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin'])->group(function () {
-    Route::get('/dataUser', [UserController::class, 'index']);
-    Route::post('/storeUser', [UserController::class, 'store']);
-    Route::put('/updateUser/{user}', [UserController::class, 'update']);
-    Route::delete('/deleteUser/{user}', [UserController::class, 'destroy']);
+    Route::get('/user', [UserController::class, 'index']);
+    Route::post('/user', [UserController::class, 'store']);
+    Route::put('/user/{user}', [UserController::class, 'update']);
+    Route::delete('/user/{user}', [UserController::class, 'destroy']);
 });
 
 Route::middleware(['auth:sanctum', 'token.expiry', 'CekUser:Super Admin,Admin,Penghuni'])->group(function () {
     Route::get('/laporan', [LaporanController::class, 'index']);
     Route::post('/laporan', [LaporanController::class, 'store']);
-    Route::get('/user', function (Request $request) {
+    Route::get('/selfUser', function (Request $request) {
         return $request->user();
     });
 });

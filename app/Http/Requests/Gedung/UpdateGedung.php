@@ -27,4 +27,15 @@ class UpdateGedung extends FormRequest
             'lokasi_id' => 'required|exists:lokasi,id',
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa string.',
+            'max' => ':attribute maksimal 255 karakter.',
+            'unique' => ':attribute sudah terdaftar.',
+            'exists' => ':attribute tidak ditemukan.',
+        ];
+    }
 }

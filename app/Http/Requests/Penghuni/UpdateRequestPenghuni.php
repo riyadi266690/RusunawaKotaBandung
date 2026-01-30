@@ -50,22 +50,16 @@ class UpdateRequestPenghuni extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'Email harus diisi.',
-            'email.unique' => 'Email sudah terdaftar.',
-            'no_tlp.required' => 'Nomor telepon harus diisi.',
-            'no_tlp.unique' => 'Nomor telepon sudah terdaftar.',
-            'nama.required' => 'Nama harus diisi.',
-            'nama.string' => 'Nama harus berupa string.',
-            'nama.max' => 'Nama maksimal 255 karakter.',
-            'tgl_lahir.required' => 'Tanggal lahir harus diisi.',
-            'tgl_lahir.date' => 'Format tanggal tidak valid.',
-            'tempat_lahir.required' => 'Tempat lahir harus diisi.',
-            'tempat_lahir.string' => 'Tempat lahir harus berupa string.',
-            'jenis_kelamin.required' => 'Jenis kelamin harus diisi.',
-            'status_kawin.required' => 'Status kawin harus diisi.',
-            'agama.required' => 'Agama harus diisi.',
-            'pekerjaan.max' => 'Pekerjaan maksimal 255 karakter.',
-            'alamat.max' => 'Alamat maksimal 255 karakter.',
+            'required' => ':attribute harus diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'max' => ':attribute maksimal :max karakter.',
+            'date' => ':attribute harus berupa tanggal.',
+            'email' => ':attribute harus berupa email.',
+            'unique' => ':attribute sudah terdaftar.',
+            'in' => ':attribute tidak valid.',
+            'integer' => ':attribute harus berupa angka.',
+            'exists' => ':attribute tidak ditemukan.',
+            'numeric' => ':attribute harus berupa angka.',
         ];
     }
 }

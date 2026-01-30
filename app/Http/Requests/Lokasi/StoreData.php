@@ -32,7 +32,7 @@ class StoreData extends FormRequest
     {
         return [
             'nama_lokasi.required' => 'Nama lokasi harus diisi.',
-            'nama_lokasi.string' => 'Nama lokasi harus berupa string.',
+            'nama_lokasi.string' => 'Nama lokasi harus berupa huruf.',
             'nama_lokasi.max' => 'Nama lokasi maksimal 255 karakter.',
             'nama_lokasi.unique' => 'Nama lokasi sudah terdaftar.',
             'kepala_lokasi.required' => 'Kepala lokasi harus diisi.',
