@@ -25,22 +25,21 @@ class StoreData extends FormRequest
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi',
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
+            'mulai_dari' => 'required|string',
+            'link_formulir' => 'nullable|string',
+            'format_kontrak' => 'nullable|file|mime:doc,docx|max:2048',
         ];
     }
 
     public function messages()
     {
         return [
-            'nama_lokasi.required' => 'Nama lokasi harus diisi.',
-            'nama_lokasi.string' => 'Nama lokasi harus berupa huruf.',
-            'nama_lokasi.max' => 'Nama lokasi maksimal 255 karakter.',
-            'nama_lokasi.unique' => 'Nama lokasi sudah terdaftar.',
-            'kepala_lokasi.required' => 'Kepala lokasi harus diisi.',
-            'kepala_lokasi.string' => 'Kepala lokasi harus berupa string.',
-            'kepala_lokasi.max' => 'Kepala lokasi maksimal 255 karakter.',
-            'alamat_lokasi.required' => 'Alamat lokasi harus diisi.',
-            'alamat_lokasi.string' => 'Alamat lokasi harus berupa string.',
-            'alamat_lokasi.max' => 'Alamat lokasi maksimal 255 karakter.',
+            'required' => ':attribute harus diisi.',
+            'unique' => ':attribute sudah ada.',
+            'max' => ':attribute tidak boleh lebih dari :max karakter.',
+            'file' => ':attribute harus berupa file.',
+            'mime' => ':attribute harus berupa file dengan ekstensi .doc atau .docx.',
+            'string' => ':attribute harus berupa text.',
         ];
     }
 }

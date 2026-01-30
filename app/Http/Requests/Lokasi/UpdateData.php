@@ -25,6 +25,9 @@ class UpdateData extends FormRequest
             'nama_lokasi' => 'required|string|max:255|unique:lokasi,nama_lokasi,' . $this->lokasi->id,
             'kepala_lokasi' => 'required|string|max:255',
             'alamat_lokasi' => 'required|string|max:255',
+            'mulai_dari' => 'required|string',
+            'link_formulir' => 'nullable|string',
+            'format_kontrak' => 'nullable|file|mime:doc,docx|max:2048',
         ];
     }
 
@@ -35,6 +38,8 @@ class UpdateData extends FormRequest
             'string' => ':attribute harus berupa string.',
             'max' => ':attribute maksimal 255 karakter.',
             'unique' => ':attribute sudah terdaftar.',
+            'file' => ':attribute harus berupa file.',
+            'mime' => ':attribute harus berupa file dengan ekstensi .doc atau .docx.',
         ];
     }
 }

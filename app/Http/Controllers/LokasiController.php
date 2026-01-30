@@ -73,8 +73,14 @@ class LokasiController extends Controller
     public function storeLokasi(StoreData $request)
     {
         try {
-            DB::transaction(function () use ($request) {
-                Lokasi::create(array_merge($request->validated(), ['id_user' => Auth::user()->id]));
+            $data = $request->validated();
+            if ($request->hasFile('format_kontrak')) {
+                $data['format_kontrak'] = $request->file('format_kontrak')->store('format_kontrak');
+            }
+
+            $data['id_user'] = Auth::id();
+            DB::transaction(function () use ($data) {
+                Lokasi::create($data);
             });
             return response()->json(['success' => true, 'message' => 'Data lokasi berhasil ditambahkan.']);
         } catch (\Exception $e) {
