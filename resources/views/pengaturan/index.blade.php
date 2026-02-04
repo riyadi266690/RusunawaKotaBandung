@@ -148,6 +148,20 @@
                             <input type="string" class="form-control" id="link_formulir" name="link_formulir">
                         </div>
                         <div class="mb-3">
+                            <label class="form-label">Status Formulir</label>
+                            <div>
+                                <label class="radio-inline me-3">
+                                    <input type="radio" name="status_formulir" value="wajib">
+                                    Wajib
+                                </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="status_formulir" value="tidak_wajib" checked>
+                                    Tidak Wajib
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="format_kontrak" class="form-label">Format Kontrak</label>
                             <input type="file" class="form-control" id="format_kontrak" name="format_kontrak"
                                 accept=".pdf,.doc,.docx">
@@ -511,63 +525,6 @@
                 });
             };
 
-            // Submit Lokasi Form (Add/Update)
-            // $('#addLokasiForm').on('submit', function(event) {
-            //     event.preventDefault();
-            //     const submitButton = $('#submitLokasiBtn');
-            //     const originalButtonText = submitButton.text();
-            //     const formMethod = $('#lokasiFormMethod').val();
-            //     const lokasiId = $('#lokasiId').val();
-
-            //     let targetUrl = storeLokasiUrl;
-            //     if (formMethod === 'PUT') {
-            //         targetUrl = updateLokasiUrlTemplate.replace(':id', lokasiId);
-            //     }
-
-            //     submitButton.prop('disabled', true).html(
-            //         '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...'
-            //     );
-
-            //     const formData = new FormData(this);
-            //     formData.delete('_method');
-
-            //     $.ajax({
-            //         url: targetUrl,
-            //         method: 'POST', // Always POST for method spoofing
-            //         data: formData,
-            //         success: function(response) {
-            //             if (response.success) {
-            //                 Swal.fire('Berhasil!', response.message, 'success');
-            //                 $('#addLokasiModal').modal('hide');
-            //                 clearLokasiFormFields();
-            //                 $('#DTLokasi').DataTable().ajax.reload(null, false);
-            //                 loadLokasiOptions();
-            //             } else {
-            //                 let errorMessage = response.message || 'Gagal menyimpan data.';
-            //                 if (response.errors) {
-            //                     errorMessage += '<br>' + Object.values(response.errors).map(e =>
-            //                         `- ${e[0]}`).join('<br>');
-            //                 }
-            //                 Swal.fire('Gagal!', errorMessage, 'error');
-            //             }
-            //         },
-            //         error: function(xhr) {
-            //             let errorMessage = 'Terjadi kesalahan saat menyimpan data.';
-            //             if (xhr.responseJSON && xhr.responseJSON.message) {
-            //                 errorMessage = xhr.responseJSON.message;
-            //             }
-            //             if (xhr.responseJSON && xhr.responseJSON.errors) {
-            //                 errorMessage += '<br>' + Object.values(xhr.responseJSON.errors).map(
-            //                     e => `- ${e[0]}`).join('<br>');
-            //             }
-            //             Swal.fire('Gagal!', errorMessage, 'error');
-            //             console.error('AJAX Error submitting lokasi form:', xhr.responseText);
-            //         },
-            //         complete: function() {
-            //             submitButton.prop('disabled', false).text(originalButtonText);
-            //         }
-            //     });
-            // });
             $('#addLokasiForm').on('submit', function(event) {
                 event.preventDefault();
 
@@ -589,7 +546,6 @@
                     url = updateLokasiUrlTemplate.replace(':id', lokasiId);
                     formData.append('_method', 'PUT');
                 } else {
-                    // HANDLE CREATE (hapus spoofing kalau ada)
                     formData.delete('_method');
                 }
 
@@ -597,8 +553,8 @@
                     url: url,
                     type: 'POST',
                     data: formData,
-                    processData: false, // WAJIB UNTUK FILE
-                    contentType: false, // WAJIB UNTUK FILE
+                    processData: false,
+                    contentType: false,
                     success: function(response) {
                         if (response.success) {
                             Swal.fire('Berhasil!', response.message, 'success');
