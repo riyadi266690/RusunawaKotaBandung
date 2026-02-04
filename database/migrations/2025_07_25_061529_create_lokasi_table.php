@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('mulai_dari');
             $table->string('link_formulir');
             $table->string('format_kontrak');
+            $table->enum('status_formulir', ['wajib', 'tidak wajib'])->default('tidak_wajib');
             $table->foreignId('id_user')->constrained('users')->onDelete('cascade');
             $table->timestamps();
         });

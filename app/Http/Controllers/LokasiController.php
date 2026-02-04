@@ -100,6 +100,16 @@ class LokasiController extends Controller
             ], 403);
         }
 
+        if ($request->status_formulir == 'tidak_wajib') {
+            $request->validate([
+                'format_kontrak' => 'nullable|file|mime:doc,docx|max:2048',
+            ]);
+        } else {
+            $request->validate([
+                'format_kontrak' => 'required|file|mime:doc,docx|max:2048',
+            ]);
+        }
+
         try {
             DB::transaction(function () use ($request, $lokasi) {
                 $lokasi->update($request->validated());

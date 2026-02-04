@@ -28,6 +28,7 @@ class StoreData extends FormRequest
             'mulai_dari' => 'required|string',
             'link_formulir' => 'nullable|string',
             'format_kontrak' => 'nullable|file|mime:doc,docx|max:2048',
+            'status_formulir' => 'required|in:wajib,tidak_wajib',
         ];
     }
 
@@ -40,6 +41,7 @@ class StoreData extends FormRequest
             'file' => ':attribute harus berupa file.',
             'mime' => ':attribute harus berupa file dengan ekstensi .doc atau .docx.',
             'string' => ':attribute harus berupa text.',
+            'in' => ':attribute tidak valid.',
         ];
     }
 }

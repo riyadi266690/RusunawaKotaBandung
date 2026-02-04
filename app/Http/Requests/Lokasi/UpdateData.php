@@ -28,6 +28,7 @@ class UpdateData extends FormRequest
             'mulai_dari' => 'required|string',
             'link_formulir' => 'nullable|string',
             'format_kontrak' => 'nullable|file|mime:doc,docx|max:2048',
+            'status_formulir' => 'required|in:wajib,tidak_wajib',
         ];
     }
 
@@ -40,6 +41,7 @@ class UpdateData extends FormRequest
             'unique' => ':attribute sudah terdaftar.',
             'file' => ':attribute harus berupa file.',
             'mime' => ':attribute harus berupa file dengan ekstensi .doc atau .docx.',
+            'in' => ':attribute tidak valid.',
         ];
     }
 }
