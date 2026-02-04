@@ -178,21 +178,35 @@ class PendaftaranController extends Controller
     public function store(Request $request)
     {
         // Validasi data awal tanpa memeriksa unik
-        $validator = Validator::make($request->all(), [
+        $lokasi = Lokasi::find($request->lokasi_id);
+        if (!$lokasi) {
+            return back()->with('gagal', 'Lokasi tidak valid.')->withInput();
+        }
+
+        $rules = [
             'nama' => 'required|string|max:255',
             'telp_pendaftar' => 'required|numeric',
-            'suket' => 'nullable|file|mimes:pdf|max:2048',
             'lokasi_id' => 'required|integer|exists:lokasi,id',
-        ], [
+        ];
+
+        if ($lokasi->status_formulir == 'wajib') {
+            $rules['suket'] = 'required|file|mimes:pdf|max:2048';
+        } else {
+            $rules['suket'] = 'nullable|file|mimes:pdf|max:2048';
+        }
+
+        $messages = [
             'nama.required' => 'Nama lengkap harus diisi.',
             'telp_pendaftar.required' => 'No Telp / WhatsApp harus diisi.',
             'telp_pendaftar.numeric' => 'No Telp / WhatsApp harus berupa angka.',
-            //'suket.required' => 'Unggah Formulir Pendaftaran.',
+            'suket.required' => 'Formulir pendaftaran wajib diunggah.',
             'suket.mimes' => 'File harus berupa PDF.',
-            'suket.max' => 'Ukuran file tidak boleh lebih dari 2MB.',
-            'lokasi_id.required' => 'Lokasi harus dipilih (Kesalahan Form).', // <-- PESAN ERROR LOKASI
-            'lokasi_id.exists' => 'ID Lokasi tidak valid.',
-        ]);
+            'suket.max' => 'Ukuran file maksimal 2MB.',
+            'lokasi_id.required' => 'Lokasi harus dipilih.',
+            'lokasi_id.exists' => 'Lokasi tidak ditemukan.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
 
         if ($validator->fails()) {
             $errors = $validator->errors()->all();
