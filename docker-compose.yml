@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/var/www/html  
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db        
+      DB_DATABASE: doker 
+      DB_USERNAME: root
+      DB_PASSWORD: root
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: doker 
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      ports:
+        - "8081:80"  
+      environment:
+        PMA_HOST: db        
+        MYSQL_ROOT_PASSWORD: root 
+      depends_on:
+        - db
+
+volumes:
+  db_data:
