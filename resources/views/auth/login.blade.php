@@ -15,7 +15,7 @@
           <div class="col-md-8 ps-md-0">
             <div class="auth-form-wrapper px-4 py-5">
               <a href="#" class="noble-ui-logo d-block mb-2">SiRAJA<span> BALAREA</span></a>
-              <h5 class="text-muted fw-normal mb-4">Hunian Nyaman dan Berkelanjutan</h5>
+              <h5 class="text-muted fw-normal mb-4">cina sehat</h5>
               <form class="forms-sample form-adi" method="POST" action="{{ route('auth.authenticate') }}">
               @csrf
                 <div class="mb-3">
