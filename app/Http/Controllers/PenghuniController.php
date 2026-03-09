@@ -23,7 +23,7 @@ class PenghuniController extends Controller
     }
 
     public function ajax_DTPenghuni(Request $request)
-     {
+    {
         // Berikan query builder langsung ke Datatables
         $query = Penghuni::query()
             ->select(
@@ -48,34 +48,34 @@ class PenghuniController extends Controller
 
         // Gunakan Yajra DataTables dengan query builder
         return DataTables::of($query)
-            ->addColumn('id', function($w){
+            ->addColumn('id', function ($w) {
                 return $w->id;
             })
             // Gunakan `editColumn` untuk menampilkan nilai yang sudah didekripsi oleh accessor.
             // Tidak perlu lagi memanggil fungsi dekripsi manual.
-            ->editColumn('nik', function($w){
+            ->editColumn('nik', function ($w) {
                 // Mengakses atribut nik yang sudah didekripsi oleh accessor
                 return $w->nik;
             })
-            ->editColumn('nama', function($w){
+            ->editColumn('nama', function ($w) {
                 // Mengakses atribut nama yang sudah didekripsi oleh accessor
                 return $w->nama;
             })
-            ->editColumn('email', function($w){
+            ->editColumn('email', function ($w) {
                 // Mengakses atribut email yang sudah didekripsi oleh accessor
                 return $w->email;
             })
-            ->editColumn('tgl_lahir', function($w){
+            ->editColumn('tgl_lahir', function ($w) {
                 return Carbon::parse($w->tgl_lahir)->format('d-m-Y');
             })
-            ->editColumn('no_tlp', function($w){
+            ->editColumn('no_tlp', function ($w) {
                 // Mengakses atribut no_tlp yang sudah didekripsi oleh accessor
                 return $w->no_tlp;
             })
-            ->editColumn('jenis_kelamin', function($w){
+            ->editColumn('jenis_kelamin', function ($w) {
                 return $w->jenis_kelamin == 1 ? 'Laki-laki' : 'Perempuan';
             })
-            ->editColumn('status_kawin', function($w){
+            ->editColumn('status_kawin', function ($w) {
                 $status = [
                     1 => 'Belum Kawin',
                     2 => 'Kawin/Nikah',
@@ -84,7 +84,7 @@ class PenghuniController extends Controller
                 ];
                 return $status[$w->status_kawin] ?? 'Tidak Diketahui';
             })
-            ->editColumn('agama', function($w){
+            ->editColumn('agama', function ($w) {
                 $agama = [
                     1 => 'Islam',
                     2 => 'Kristen',
@@ -96,14 +96,14 @@ class PenghuniController extends Controller
                 ];
                 return $agama[$w->agama] ?? 'Tidak Diketahui';
             })
-            ->addColumn('aksi', function($w){
+            ->addColumn('aksi', function ($w) {
                 return '<div class="btn-group">
-                            <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi</button>
-                            <div class="dropdown-menu">                                                          
-
-                                <a class="dropdown-item" href="#" onclick="hapusPenghuni(' . $w->id . ')">Hapus</a>                        
-                            </div>
-                        </div>';
+                     <button type="button" class="btn btn-primary btn-xs dropdown-toggle" data-bs-toggle="dropdown">Aksi</button>
+                        <div class="dropdown-menu">                                                          
+                            <a class="dropdown-item" href="#" onclick="hapusPenghuni(' . $w->id . ')">Hapus</a>                        
+                            <a class="dropdown-item" href="#" onclick="editPenghuni(' . $w->id . '); return false;">Edit</a>                        
+                        </div>
+                </div>';
             })
             // Tambahkan logika filter
             ->filter(function ($query) use ($request) {
@@ -113,11 +113,11 @@ class PenghuniController extends Controller
                     $hmac = hmac($keyword);
 
                     // Lakukan pencarian langsung pada kolom HMAC di database
-                    $query->where(function($q) use ($hmac) {
+                    $query->where(function ($q) use ($hmac) {
                         $q->where('nik_hmac', $hmac)
-                          ->orWhere('no_tlp_hmac', $hmac)
-                          ->orWhere('email_hmac', $hmac)
-                          ->orwhere('nama_hmac', $hmac); // Jika Anda menambahkan kolom nama_hmac di database
+                            ->orWhere('no_tlp_hmac', $hmac)
+                            ->orWhere('email_hmac', $hmac)
+                            ->orwhere('nama_hmac', $hmac); // Jika Anda menambahkan kolom nama_hmac di database
                     });
                 }
             })
@@ -184,7 +184,7 @@ class PenghuniController extends Controller
                 'errors' => $validator->errors()
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
-        
+
         try {
             DB::beginTransaction();
 
@@ -200,13 +200,13 @@ class PenghuniController extends Controller
                 Log::error('Gagal mendapatkan HMAC dari API untuk data penghuni.');
                 throw new \Exception('Gagal mendapatkan HMAC dari API.');
             }
-           
+
             // Pengecekan keunikan menggunakan HMAC
             $existingPenghuni = Penghuni::where('nik_hmac', $nikHmac)
-                                        ->orWhere('no_tlp_hmac', $noTlpHmac)
-                                        ->orWhere('email_hmac', $emailHmac)
-                                        ->first();
-            
+                ->orWhere('no_tlp_hmac', $noTlpHmac)
+                ->orWhere('email_hmac', $emailHmac)
+                ->first();
+
             if ($existingPenghuni) {
                 DB::rollback();
                 $errorMessage = '';
@@ -229,7 +229,7 @@ class PenghuniController extends Controller
                 $request->no_tlp,
                 $emailFormatted
             ];
-            
+
             // Log data plaintext sebelum seal
             Log::info('Plain texts sent for seal:', $plainTextsToSeal);
 
@@ -271,14 +271,13 @@ class PenghuniController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data penghuni berhasil ditambahkan.']);
-
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error saat menyimpan data penghuni: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => 'Terjadi kesalahan saat menyimpan data: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    
+
 
     /**
      * Display the specified resource.
@@ -291,30 +290,30 @@ class PenghuniController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-   public function edit($id)
+    public function edit($id)
     {
         try {
             $penghuni = Penghuni::findOrFail($id);
 
             // Kumpulkan semua data terenkripsi yang perlu didekripsi
-            $encryptedTexts = [
-                $penghuni->nik,
-                $penghuni->nama,
-                $penghuni->no_tlp,
-                $penghuni->email
-            ];
+            // $encryptedTexts = [
+            //     $penghuni->nik,
+            //     $penghuni->nama,
+            //     $penghuni->no_tlp,
+            //     $penghuni->email
+            // ];
 
-            $decryptedTextsMap = unsealNames($encryptedTexts);
+            // $decryptedTextsMap = unsealNames($encryptedTexts);
 
             // Siapkan data yang didekripsi untuk dikirim ke frontend
             $data = [
                 'id' => $penghuni->id,
-                'nik' => $decryptedTextsMap[$penghuni->nik] ?? 'Error Dekripsi',
-                'nama' => $decryptedTextsMap[$penghuni->nama] ?? 'Error Dekripsi',
-                'email' => $decryptedTextsMap[$penghuni->email] ?? 'Error Dekripsi',
+                'nik' => $penghuni->nik,
+                'nama' => $penghuni->nama,
+                'email' => $penghuni->email,
                 'tgl_lahir' => $penghuni->tgl_lahir,
                 'tempat_lahir' => $penghuni->tempat_lahir,
-                'no_tlp' => $decryptedTextsMap[$penghuni->no_tlp] ?? 'Error Dekripsi',
+                'no_tlp' => $penghuni->no_tlp,
                 'jenis_kelamin' => $penghuni->jenis_kelamin,
                 'status_kawin' => $penghuni->status_kawin,
                 'agama' => $penghuni->agama,
@@ -323,7 +322,6 @@ class PenghuniController extends Controller
             ];
 
             return response()->json(['success' => true, 'data' => $data]);
-
         } catch (\Exception $e) {
             Log::error('Error fetching penghuni for edit: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return response()->json(['success' => false, 'message' => 'Gagal mengambil data penghuni: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -379,67 +377,67 @@ class PenghuniController extends Controller
 
             $penghuni = Penghuni::findOrFail($id);
 
-            // Konversi nama ke uppercase dan email ke lowercase
-            $namaFormatted = strtoupper($request->nama);
-            $emailFormatted = strtolower($request->email);
+            // // Konverxsi nama ke uppercase dan email ke lowercase
+            // $namaFormatted = strtoupper($request->nama);
+            // $emailFormatted = strtolower($request->email);
 
-            // Hashing data unik yang mungkin berubah (No. Telp, Email)
-            // NIK tidak di-hash ulang karena tidak diubah
-            $noTlpHmac = hmac($request->no_tlp);
-            $emailHmac = hmac($emailFormatted);
+            // // Hashing data unik yang mungkin berubah (No. Telp, Email)
+            // // NIK tidak di-hash ulang karena tidak diubah
+            // $noTlpHmac = hmac($request->no_tlp);
+            // $emailHmac = hmac($emailFormatted);
 
-            if (!$noTlpHmac || !$emailHmac) {
-                Log::error('Gagal mendapatkan HMAC dari API untuk data penghuni saat update.');
-                throw new \Exception('Gagal mendapatkan HMAC dari API.');
-            }
+            // if (!$noTlpHmac || !$emailHmac) {
+            //     Log::error('Gagal mendapatkan HMAC dari API untuk data penghuni saat update.');
+            //     throw new \Exception('Gagal mendapatkan HMAC dari API.');
+            // }
 
-            // Pengecekan keunikan untuk No. Telp dan Email (kecuali data penghuni yang sedang diedit)
-            $existingPenghuniCheck = Penghuni::where(function($query) use ($noTlpHmac, $emailHmac) {
-                                            $query->where('no_tlp_hmac', $noTlpHmac)
-                                                  ->orWhere('email_hmac', $emailHmac);
-                                        })
-                                        ->where('id', '!=', $id) // Kecualikan data yang sedang diedit
-                                        ->first();
-            
-            if ($existingPenghuniCheck) {
-                DB::rollback();
-                $errorMessage = '';
-                if (Penghuni::where('no_tlp_hmac', $noTlpHmac)->where('id', '!=', $id)->exists()) {
-                    $errorMessage .= 'Nomor Telepon sudah terdaftar pada penghuni lain. ';
-                }
-                if (Penghuni::where('email_hmac', $emailHmac)->where('id', '!=', $id)->exists()) {
-                    $errorMessage .= 'Email sudah terdaftar pada penghuni lain. ';
-                }
-                return response()->json(['success' => false, 'message' => $errorMessage], Response::HTTP_CONFLICT);
-            }
+            // // Pengecekan keunikan untuk No. Telp dan Email (kecuali data penghuni yang sedang diedit)
+            // $existingPenghuniCheck = Penghuni::where(function ($query) use ($noTlpHmac, $emailHmac) {
+            //     $query->where('no_tlp_hmac', $noTlpHmac)
+            //         ->orWhere('email_hmac', $emailHmac);
+            // })
+            //     ->where('id', '!=', $id) // Kecualikan data yang sedang diedit
+            //     ->first();
+
+            // if ($existingPenghuniCheck) {
+            //     DB::rollback();
+            //     $errorMessage = '';
+            //     if (Penghuni::where('no_tlp_hmac', $noTlpHmac)->where('id', '!=', $id)->exists()) {
+            //         $errorMessage .= 'Nomor Telepon sudah terdaftar pada penghuni lain. ';
+            //     }
+            //     if (Penghuni::where('email_hmac', $emailHmac)->where('id', '!=', $id)->exists()) {
+            //         $errorMessage .= 'Email sudah terdaftar pada penghuni lain. ';
+            //     }
+            //     return response()->json(['success' => false, 'message' => $errorMessage], Response::HTTP_CONFLICT);
+            // }
 
             // Enkripsi data sensitif yang mungkin berubah (Nama, No. Telp, Email)
-            $plainTextsToSeal = [
-                $namaFormatted,
-                $request->no_tlp,
-                $emailFormatted
-            ];
-            
-            $sealedTexts = sealNames($plainTextsToSeal);
+            // $plainTextsToSeal = [
+            //     $namaFormatted,
+            //     $request->no_tlp,
+            //     $emailFormatted
+            // ];
 
-            if (empty($sealedTexts) || count($sealedTexts) < 3) { // Hanya 3 karena NIK tidak di-seal ulang
-                Log::error('Gagal mendapatkan respons enkripsi yang valid dari API untuk data penghuni saat update.');
-                throw new \Exception('Gagal mendapatkan respons enkripsi yang valid dari API.');
-            }
+            // $sealedTexts = sealNames($plainTextsToSeal);
 
-            $encryptedNama = $sealedTexts[$namaFormatted];
-            $encryptedNoTlp = $sealedTexts[$request->no_tlp];
-            $encryptedEmail = $sealedTexts[$emailFormatted];
+            // if (empty($sealedTexts) || count($sealedTexts) < 3) {
+            //     Log::error('Gagal mendapatkan respons enkripsi yang valid dari API untuk data penghuni saat update.');
+            //     throw new \Exception('Gagal mendapatkan respons enkripsi yang valid dari API.');
+            // }
+
+            // $encryptedNama = $sealedTexts[$namaFormatted];
+            // $encryptedNoTlp = $sealedTexts[$request->no_tlp];
+            // $encryptedEmail = $sealedTexts[$emailFormatted];
 
             // Update data di database
             // NIK tidak diubah
-            $penghuni->nama = $encryptedNama;
-            $penghuni->email = $encryptedEmail;
-            $penghuni->email_hmac = $emailHmac;
+            $penghuni->nama = $request->nama;
+            $penghuni->email = $request->email;
+            $penghuni->email_hmac = 'email_hmac';
             $penghuni->tgl_lahir = $request->tgl_lahir;
             $penghuni->tempat_lahir = $request->tempat_lahir; // Simpan tempat lahir
-            $penghuni->no_tlp = $encryptedNoTlp;
-            $penghuni->no_tlp_hmac = $noTlpHmac;
+            $penghuni->no_tlp = $request->no_tlp;
+            $penghuni->no_tlp_hmac = 'no_tlp_hmac';
             $penghuni->jenis_kelamin = $request->jenis_kelamin;
             $penghuni->status_kawin = $request->status_kawin;
             $penghuni->agama = $request->agama;
@@ -449,7 +447,6 @@ class PenghuniController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data penghuni berhasil diperbarui.']);
-
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error saat memperbarui data penghuni: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -473,7 +470,6 @@ class PenghuniController extends Controller
 
             DB::commit();
             return response()->json(['success' => true, 'message' => 'Data penghuni berhasil dihapus.']);
-
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Error deleting penghuni: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
