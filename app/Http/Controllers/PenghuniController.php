@@ -296,24 +296,24 @@ class PenghuniController extends Controller
             $penghuni = Penghuni::findOrFail($id);
 
             // Kumpulkan semua data terenkripsi yang perlu didekripsi
-            // $encryptedTexts = [
-            //     $penghuni->nik,
-            //     $penghuni->nama,
-            //     $penghuni->no_tlp,
-            //     $penghuni->email
-            // ];
+            $encryptedTexts = [
+                $penghuni->nik,
+                $penghuni->nama,
+                $penghuni->no_tlp,
+                $penghuni->email
+            ];
 
-            // $decryptedTextsMap = unsealNames($encryptedTexts);
+            $decryptedTextsMap = unsealNames($encryptedTexts);
 
             // Siapkan data yang didekripsi untuk dikirim ke frontend
             $data = [
                 'id' => $penghuni->id,
-                'nik' => $penghuni->nik,
-                'nama' => $penghuni->nama,
-                'email' => $penghuni->email,
+                'nik' => $decryptedTextsMap[$penghuni->nik],
+                'nama' => $decryptedTextsMap[$penghuni->nama],
+                'email' => $decryptedTextsMap[$penghuni->email],
                 'tgl_lahir' => $penghuni->tgl_lahir,
                 'tempat_lahir' => $penghuni->tempat_lahir,
-                'no_tlp' => $penghuni->no_tlp,
+                'no_tlp' => $decryptedTextsMap[$penghuni->nik],
                 'jenis_kelamin' => $penghuni->jenis_kelamin,
                 'status_kawin' => $penghuni->status_kawin,
                 'agama' => $penghuni->agama,
@@ -377,67 +377,67 @@ class PenghuniController extends Controller
 
             $penghuni = Penghuni::findOrFail($id);
 
-            // // Konverxsi nama ke uppercase dan email ke lowercase
-            // $namaFormatted = strtoupper($request->nama);
-            // $emailFormatted = strtolower($request->email);
+            // Konverxsi nama ke uppercase dan email ke lowercase
+            $namaFormatted = strtoupper($request->nama);
+            $emailFormatted = strtolower($request->email);
 
-            // // Hashing data unik yang mungkin berubah (No. Telp, Email)
-            // // NIK tidak di-hash ulang karena tidak diubah
-            // $noTlpHmac = hmac($request->no_tlp);
-            // $emailHmac = hmac($emailFormatted);
+            // Hashing data unik yang mungkin berubah (No. Telp, Email)
+            // NIK tidak di-hash ulang karena tidak diubah
+            $noTlpHmac = hmac($request->no_tlp);
+            $emailHmac = hmac($emailFormatted);
 
-            // if (!$noTlpHmac || !$emailHmac) {
-            //     Log::error('Gagal mendapatkan HMAC dari API untuk data penghuni saat update.');
-            //     throw new \Exception('Gagal mendapatkan HMAC dari API.');
-            // }
+            if (!$noTlpHmac || !$emailHmac) {
+                Log::error('Gagal mendapatkan HMAC dari API untuk data penghuni saat update.');
+                throw new \Exception('Gagal mendapatkan HMAC dari API.');
+            }
 
-            // // Pengecekan keunikan untuk No. Telp dan Email (kecuali data penghuni yang sedang diedit)
-            // $existingPenghuniCheck = Penghuni::where(function ($query) use ($noTlpHmac, $emailHmac) {
-            //     $query->where('no_tlp_hmac', $noTlpHmac)
-            //         ->orWhere('email_hmac', $emailHmac);
-            // })
-            //     ->where('id', '!=', $id) // Kecualikan data yang sedang diedit
-            //     ->first();
+            // Pengecekan keunikan untuk No. Telp dan Email (kecuali data penghuni yang sedang diedit)
+            $existingPenghuniCheck = Penghuni::where(function ($query) use ($noTlpHmac, $emailHmac) {
+                $query->where('no_tlp_hmac', $noTlpHmac)
+                    ->orWhere('email_hmac', $emailHmac);
+            })
+                ->where('id', '!=', $id) // Kecualikan data yang sedang diedit
+                ->first();
 
-            // if ($existingPenghuniCheck) {
-            //     DB::rollback();
-            //     $errorMessage = '';
-            //     if (Penghuni::where('no_tlp_hmac', $noTlpHmac)->where('id', '!=', $id)->exists()) {
-            //         $errorMessage .= 'Nomor Telepon sudah terdaftar pada penghuni lain. ';
-            //     }
-            //     if (Penghuni::where('email_hmac', $emailHmac)->where('id', '!=', $id)->exists()) {
-            //         $errorMessage .= 'Email sudah terdaftar pada penghuni lain. ';
-            //     }
-            //     return response()->json(['success' => false, 'message' => $errorMessage], Response::HTTP_CONFLICT);
-            // }
+            if ($existingPenghuniCheck) {
+                DB::rollback();
+                $errorMessage = '';
+                if (Penghuni::where('no_tlp_hmac', $noTlpHmac)->where('id', '!=', $id)->exists()) {
+                    $errorMessage .= 'Nomor Telepon sudah terdaftar pada penghuni lain. ';
+                }
+                if (Penghuni::where('email_hmac', $emailHmac)->where('id', '!=', $id)->exists()) {
+                    $errorMessage .= 'Email sudah terdaftar pada penghuni lain. ';
+                }
+                return response()->json(['success' => false, 'message' => $errorMessage], Response::HTTP_CONFLICT);
+            }
 
             // Enkripsi data sensitif yang mungkin berubah (Nama, No. Telp, Email)
-            // $plainTextsToSeal = [
-            //     $namaFormatted,
-            //     $request->no_tlp,
-            //     $emailFormatted
-            // ];
+            $plainTextsToSeal = [
+                $namaFormatted,
+                $request->no_tlp,
+                $emailFormatted
+            ];
 
-            // $sealedTexts = sealNames($plainTextsToSeal);
+            $sealedTexts = sealNames($plainTextsToSeal);
 
-            // if (empty($sealedTexts) || count($sealedTexts) < 3) {
-            //     Log::error('Gagal mendapatkan respons enkripsi yang valid dari API untuk data penghuni saat update.');
-            //     throw new \Exception('Gagal mendapatkan respons enkripsi yang valid dari API.');
-            // }
+            if (empty($sealedTexts) || count($sealedTexts) < 3) {
+                Log::error('Gagal mendapatkan respons enkripsi yang valid dari API untuk data penghuni saat update.');
+                throw new \Exception('Gagal mendapatkan respons enkripsi yang valid dari API.');
+            }
 
-            // $encryptedNama = $sealedTexts[$namaFormatted];
-            // $encryptedNoTlp = $sealedTexts[$request->no_tlp];
-            // $encryptedEmail = $sealedTexts[$emailFormatted];
+            $encryptedNama = $sealedTexts[$namaFormatted];
+            $encryptedNoTlp = $sealedTexts[$request->no_tlp];
+            $encryptedEmail = $sealedTexts[$emailFormatted];
 
             // Update data di database
             // NIK tidak diubah
-            $penghuni->nama = $request->nama;
-            $penghuni->email = $request->email;
-            $penghuni->email_hmac = 'email_hmac';
+            $penghuni->nama = $encryptedNama;
+            $penghuni->email = $encryptedEmail;
+            $penghuni->email_hmac = $emailHmac;
             $penghuni->tgl_lahir = $request->tgl_lahir;
             $penghuni->tempat_lahir = $request->tempat_lahir; // Simpan tempat lahir
-            $penghuni->no_tlp = $request->no_tlp;
-            $penghuni->no_tlp_hmac = 'no_tlp_hmac';
+            $penghuni->no_tlp = $encryptedNoTlp;
+            $penghuni->no_tlp_hmac = $noTlpHmac;
             $penghuni->jenis_kelamin = $request->jenis_kelamin;
             $penghuni->status_kawin = $request->status_kawin;
             $penghuni->agama = $request->agama;
