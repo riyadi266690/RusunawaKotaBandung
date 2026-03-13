@@ -398,6 +398,7 @@
                 error: function(xhr) {
                     Swal.fire('Error', 'Gagal mengambil data penghuni untuk diedit.', 'error');
                     console.error('AJAX Error fetching penghuni data for edit:', xhr.responseText);
+                    window.location.reload();
                 }
             });
         };
@@ -453,7 +454,7 @@
             }
             submitButton.prop('disabled', true).html(
                 '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Memproses...'
-                );
+            );
 
             const formData = $(this).serialize();
             $.ajax({
