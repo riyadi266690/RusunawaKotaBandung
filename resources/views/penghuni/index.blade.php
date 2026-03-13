@@ -393,12 +393,12 @@
                         $('#addPenghuniModal').modal('show');
                     } else {
                         Swal.fire('Error', response.message, 'error');
+                        window.location.reload();
                     }
                 },
                 error: function(xhr) {
                     Swal.fire('Error', 'Gagal mengambil data penghuni untuk diedit.', 'error');
                     console.error('AJAX Error fetching penghuni data for edit:', xhr.responseText);
-                    window.location.reload();
                 }
             });
         };
