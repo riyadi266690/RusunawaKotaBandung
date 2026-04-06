@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('gedung_id')->references('id')->on('gedung')->onDelete('cascade');
             $table->string('nomor');
-            $table->string('lantai');//1 to 5
-            $table->string('tipe_unit');//Hunian atau RBH 
+            $table->string('lantai');
+            $table->string('tipe_unit');
             $table->string('status_jual')->default('1');
             $table->timestamps();
         });
