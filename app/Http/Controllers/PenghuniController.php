@@ -305,15 +305,14 @@ class PenghuniController extends Controller
 
             $decryptedTextsMap = unsealNames($encryptedTexts);
 
-            // Siapkan data yang didekripsi untuk dikirim ke frontend
             $data = [
                 'id' => $penghuni->id,
-                'nik' => $decryptedTextsMap[$penghuni->nik],
-                'nama' => $decryptedTextsMap[$penghuni->nama],
-                'email' => $decryptedTextsMap[$penghuni->email],
+                'nik' => $penghuni->nik_hmac,
+                'nama' => $penghuni->nama,
+                'email' => $penghuni->email,
                 'tgl_lahir' => $penghuni->tgl_lahir,
                 'tempat_lahir' => $penghuni->tempat_lahir,
-                'no_tlp' => $decryptedTextsMap[$penghuni->nik],
+                'no_tlp' => $penghuni->no_tlp,
                 'jenis_kelamin' => $penghuni->jenis_kelamin,
                 'status_kawin' => $penghuni->status_kawin,
                 'agama' => $penghuni->agama,
