@@ -33,9 +33,7 @@ class SimpleBasicAuth
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'
-            ], 401, [
-                'WWW-Authenticate' => 'Basic realm="API Access"'
-            ]);
+            ], 401);
         }
 
         return $next($request);
