@@ -1,0 +1,303 @@
+{
+	"info": {
+		"_postman_id": "d057a6db-cf7b-4dfd-a8e5-eb6ad7f6e80b",
+		"name": "Rusunawa Kota Bandung API",
+		"description": "Collection untuk pengujian API BSSN Cryptography dan API Penghuni (Basic Auth)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BSSN Cryptography (Public)",
+			"item": [
+				{
+					"name": "Seal Single Text",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"adi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bssn/seal",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bssn",
+								"seal"
+							]
+						},
+						"description": "Mengenkripsi teks tunggal (single text)"
+					},
+					"response": []
+				},
+				{
+					"name": "Unseal Single Text",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ciphertext\": \"s0:kK/rXOhMP50Wq+plEMM4BJIRX8fc5pqWQsjycgwHK5db\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bssn/unseal",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bssn",
+								"unseal"
+							]
+						},
+						"description": "Mendekripsi ciphertext tunggal (single text)"
+					},
+					"response": []
+				},
+				{
+					"name": "Seal Multiple Texts (Names)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"plaintexts\": [\n    \"adi lagi\",\n    \"adi2\"\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bssn/seal-names",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bssn",
+								"seal-names"
+							]
+						},
+						"description": "Mengenkripsi banyak teks/nama sekaligus (batch)"
+					},
+					"response": []
+				},
+				{
+					"name": "Unseal Multiple Texts (Names)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ciphertexts\": [\n    \"s0:kK/rXOhMP50Wq+plEMM4BJIRX8fc5pqWQsjycgwHK5db\",\n    \"s0:2uZVmA0cnpVh0zCbz7i8TAtb43sl/fuAZ9qvFTh0EH4+\"\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bssn/unseal-names",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bssn",
+								"unseal-names"
+							]
+						},
+						"description": "Mendekripsi banyak ciphertext sekaligus (batch)"
+					},
+					"response": []
+				},
+				{
+					"name": "HMAC Generation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"adi\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bssn/hmac",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bssn",
+								"hmac"
+							]
+						},
+						"description": "Membuat hash HMAC untuk suatu teks"
+					},
+					"response": []
+				},
+				{
+					"name": "Verify HMAC",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"text\": \"adi\",\n  \"hmac\": \"put_hmac_hash_here\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/bssn/verify-hmac",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"bssn",
+								"verify-hmac"
+							]
+						},
+						"description": "Memverifikasi apakah hash HMAC cocok dengan teks aslinya"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Penghuni (Basic Auth)",
+			"item": [
+				{
+					"name": "Get Penghuni",
+					"request": {
+						"auth": {
+							"type": "basic",
+							"basic": [
+								{
+									"key": "password",
+									"value": "password",
+									"type": "string"
+								},
+								{
+									"key": "username",
+									"value": "admin@p3jb.com",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/penghuni?nama_lokasi=Rusunawa Bandung",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"penghuni"
+							],
+							"query": [
+								{
+									"key": "nama_lokasi",
+									"value": "Rusunawa Bandung"
+								}
+							]
+						},
+						"description": "Mengambil data penghuni dengan parameter nama_lokasi. Membutuhkan autentikasi Basic Auth database (Username: admin@p3jb.com, Password: password)."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://127.0.0.1:8000",
+			"type": "string"
+		}
+	]
+}
