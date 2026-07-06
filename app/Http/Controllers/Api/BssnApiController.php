@@ -27,22 +27,24 @@ class BssnApiController extends Controller
     }
 
     /**
-     * Unseal (decrypt) multiple texts.
+     * Unseal (decrypt) a single ciphertext.
      *
-     * Decrypts an array of ciphertexts using the BSSN unseal service.
+     * Decrypts a single ciphertext string using the BSSN unseal service.
      */
     public function unseal(Request $request)
     {
         $validated = $request->validate([
-            'ciphertext' => 'required|array',
-            'ciphertext.*' => 'required|string',
+            'ciphertext' => 'required|string',
         ]);
 
-        $result = unseal($validated['ciphertext']);
+        $decryptedMap = unseal([$validated['ciphertext']]);
+        $result = $decryptedMap[$validated['ciphertext']] ?? null;
 
         return response()->json([
             'success' => true,
-            'data' => $result,
+            'data' => [
+                'plaintext' => $result
+            ],
         ]);
     }
 
