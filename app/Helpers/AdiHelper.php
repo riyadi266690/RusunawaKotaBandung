@@ -64,6 +64,12 @@ function seal($var)
     $keyFile = config('services.bssn.key_path');
     $url = 'https://10.110.35.40:2709/seal';
 
+    $postData = json_encode([
+        'Plaintext' => [
+            ['text' => $var]
+        ]
+    ]);
+
     $ch = curl_init($url);
 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -74,24 +80,20 @@ function seal($var)
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
     curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
     curl_setopt($ch, CURLOPT_POST, true);
-
-    // Kirimkan langsung plaintext-nya, tanpa JSON
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $var);
-
-    // Jangan pakai application/json jika kirim plaintext
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: text/plain'
+        'Content-Type: application/json'
     ));
 
     $response = curl_exec($ch);
 
     if (curl_errno($ch)) {
-        echo 'Error: ' . curl_error($ch);
+        Log::error('BSSN Seal Error: ' . curl_error($ch));
     }
 
     curl_close($ch);
 
-    return json_decode($response, true); // Jika response memang JSON
+    return json_decode($response, true);
 }
 function unseal(array $var)
 {
