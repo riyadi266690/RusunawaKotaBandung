@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class SimpleBasicAuth
@@ -16,7 +17,7 @@ class SimpleBasicAuth
         $username = $request->getUser();
         $password = $request->getPassword();
 
-        // Fallback jika server web (seperti Nginx/Apache + PHP-FPM) tidak mem-passing PHP_AUTH_USER & PHP_AUTH_PW
+        // Fallback jika server web tidak mem-passing PHP_AUTH_USER & PHP_AUTH_PW
         if (null === $username || null === $password) {
             $authHeader = $request->header('Authorization');
             if ($authHeader && preg_match('/Basic\s+(.*)$/i', $authHeader, $matches)) {
@@ -28,8 +29,16 @@ class SimpleBasicAuth
             }
         }
 
-        // Cek username 'tes' dan password 'pasword' atau 'password' (toleransi typo)
-        if ($username !== 'tes' || ($password !== 'pasword' && $password !== 'password')) {
+        // Jika username atau password kosong, langsung tolak
+        if (empty($username) || empty($password)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        // Lakukan autentikasi menggunakan data dari tabel `users` (hanya untuk satu request)
+        if (!Auth::once(['email' => $username, 'password' => $password])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized'

@@ -7,7 +7,9 @@ use App\Models\Kontrak;
 use App\Models\Lokasi;
 use App\Models\Penghuni;
 use App\Models\Unit;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PenghuniApiTest extends TestCase
@@ -29,7 +31,7 @@ class PenghuniApiTest extends TestCase
     public function test_api_rejects_invalid_credentials(): void
     {
         $response = $this->withHeaders([
-            'PHP_AUTH_USER' => 'salah',
+            'PHP_AUTH_USER' => 'salah@test.com',
             'PHP_AUTH_PW' => 'salahjuga',
         ])->getJson('/api/penghuni?nama_lokasi=Rusun');
 
@@ -41,9 +43,14 @@ class PenghuniApiTest extends TestCase
      */
     public function test_api_requires_nama_lokasi_parameter(): void
     {
+        $user = User::factory()->create([
+            'email' => 'admin@test.com',
+            'password' => Hash::make('password123')
+        ]);
+
         $response = $this->withHeaders([
-            'PHP_AUTH_USER' => 'tes',
-            'PHP_AUTH_PW' => 'pasword',
+            'PHP_AUTH_USER' => 'admin@test.com',
+            'PHP_AUTH_PW' => 'password123',
         ])->getJson('/api/penghuni');
 
         $response->assertStatus(422)
@@ -55,9 +62,14 @@ class PenghuniApiTest extends TestCase
      */
     public function test_api_returns_404_if_lokasi_not_found(): void
     {
+        $user = User::factory()->create([
+            'email' => 'admin@test.com',
+            'password' => Hash::make('password123')
+        ]);
+
         $response = $this->withHeaders([
-            'PHP_AUTH_USER' => 'tes',
-            'PHP_AUTH_PW' => 'pasword',
+            'PHP_AUTH_USER' => 'admin@test.com',
+            'PHP_AUTH_PW' => 'password123',
         ])->getJson('/api/penghuni?nama_lokasi=LokasiPalsu');
 
         $response->assertStatus(404)
@@ -72,6 +84,11 @@ class PenghuniApiTest extends TestCase
      */
     public function test_api_returns_penghuni_data_with_contracts(): void
     {
+        $user = User::factory()->create([
+            'email' => 'admin@test.com',
+            'password' => Hash::make('password123')
+        ]);
+
         // Create Lokasi
         $lokasi = Lokasi::create([
             'nama_lokasi' => 'Rusunawa Bandung',
@@ -121,8 +138,8 @@ class PenghuniApiTest extends TestCase
         ]);
 
         $response = $this->withHeaders([
-            'PHP_AUTH_USER' => 'tes',
-            'PHP_AUTH_PW' => 'pasword',
+            'PHP_AUTH_USER' => 'admin@test.com',
+            'PHP_AUTH_PW' => 'password123',
         ])->getJson('/api/penghuni?nama_lokasi=Rusunawa Bandung');
 
         $response->assertStatus(200)
