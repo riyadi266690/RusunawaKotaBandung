@@ -37,10 +37,13 @@ class Unit extends Model
     }
     public function scopeAvailable(Builder $query): void
     {
-        $query->whereDoesntHave('kontrak') // Kondisi 1: Tidak ada kontrak sama sekali
-              ->orWhereHas('kontrak', function (Builder $q) {
-                  // Kondisi 2: Memiliki kontrak yang status_kontrak-nya adalah 0
-                  $q->where('status_kontrak', 0); 
+        $query->where('status_jual', '1') // Hanya unit yang tersedia
+              ->where(function (Builder $q) {
+                  $q->whereDoesntHave('kontrak') // Kondisi 1: Tidak ada kontrak sama sekali
+                    ->orWhereHas('kontrak', function (Builder $subQ) {
+                        // Kondisi 2: Memiliki kontrak yang status_kontrak-nya adalah 0
+                        $subQ->where('status_kontrak', 0); 
+                    });
               });
     }
 }
